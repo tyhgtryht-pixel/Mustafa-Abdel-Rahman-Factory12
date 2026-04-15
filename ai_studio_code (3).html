@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مصنع مصطفى عبد الرحمن - إدارة الديون</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Tajawal', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: '#3b82f6',
+                        'brand-soft': 'rgba(59, 130, 246, 0.1)',
+                        success: '#22c55e',
+                        'success-soft': 'rgba(34, 197, 94, 0.1)',
+                        danger: '#ef4444',
+                        'danger-soft': 'rgba(239, 68, 68, 0.1)',
+                        warning: '#f59e0b',
+                        'warning-soft': 'rgba(245, 158, 11, 0.1)',
+                        background: 'var(--bg-background)',
+                        surface: 'var(--bg-surface)',
+                        border: 'var(--border-color)',
+                        text: 'var(--text-main)',
+                        'text-dim': 'var(--text-dim)',
+                        overlay: 'rgba(0,0,0,0.5)'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        :root {
+            --bg-background: #f8fafc;
+            --bg-surface: #ffffff;
+            --border-color: #e2e8f0;
+            --text-main: #0f172a;
+            --text-dim: #64748b;
+        }
+        .dark {
+            --bg-background: #0f172a;
+            --bg-surface: #1e293b;
+            --border-color: #334155;
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+        }
+        body {
+            background-color: var(--bg-background);
+            color: var(--text-main);
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .card-shadow {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .dark .card-shadow {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 10px; }
+        
+        /* Animations */
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes scaleIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        
+        .animate-fade { animation: fadeIn 0.2s ease-out forwards; }
+        .animate-scale { animation: scaleIn 0.2s ease-out forwards; }
+        .animate-slide { animation: slideUp 0.3s ease-out forwards; }
+        
+        /* Print Styles */
+        @media print {
+            body * { visibility: hidden; }
+            #print-area, #print-area * { visibility: visible; }
+            #print-area { position: absolute; left: 0; top: 0; width: 100%; }
+            .no-print { display: none !important; }
+        }
+    </style>
+</head>
+<body class="min-h-screen pb-20">
+
+    <!-- Toast Notification -->
+    <div id="toast-container" class="fixed bottom-4 left-1/2 -translate-x-1/2 z-[200] flex flex-col gap-2"></div>
+
+    <!-- Login Screen -->
+    <div id="login-screen" class="min-h-screen flex items-center justify-center p-4 bg-background hidden">
+        <div class="bg-surface p-8 rounded-[40px] card-shadow w-full max-w-md text-center border border-border">
+            <img id="login-logo" src="" class="w-20 h-20 mx-auto mb-6 rounded-2xl object-cover" />
+            <h1 id="login-title" class="text-2xl font-black mb-2"></h1>
+            <p class="text-text-dim mb-8 text-sm">نظام إدارة الديون والتحصيل</p>
+            
+            <div id="auth-error" class="bg-danger-soft text-danger p-4 rounded-2xl mb-6 text-xs font-bold border border-danger/20 hidden"></div>
+            
+            <div class="flex bg-background p-1.5 rounded-2xl mb-8 border border-border">
+                <button onclick="setLoginMode('google')" id="tab-google" class="flex-1 py-2.5 rounded-xl font-bold text-sm transition-all bg-brand text-white shadow-lg">جوجل</button>
+                <button onclick="setLoginMode('custom')" id="tab-custom" class="flex-1 py-2.5 rounded-xl font-bold text-sm transition-all text-text-dim hover:bg-surface">يدوي</button>
+            </div>
+            
+            <div id="google-login-form">
+                <button onclick="handleLogin('google')" class="w-full bg-brand text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-brand/20">
+                    <i class="ph-bold ph-google-logo text-lg"></i> دخول بجوجل (محاكاة)
+                </button>
+            </div>
+            
+            <form id="custom-login-form" onsubmit="handleLogin('custom', event)" class="space-y-4 hidden">
+                <input id="login-username" placeholder="اسم المستخدم" class="w-full bg-background p-4 rounded-xl outline-none border border-border focus:border-brand text-sm transition-all" required />
+                <input id="login-password" type="password" placeholder="كلمة المرور" class="w-full bg-background p-4 rounded-xl outline-none border border-border focus:border-brand text-sm transition-all" required />
+                <button type="submit" class="w-full bg-brand text-white py-4 rounded-xl font-bold shadow-xl shadow-brand/20 hover:bg-brand/90 transition-all">دخول</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div id="main-app" class="hidden">
+        <!-- Header -->
+        <header class="bg-surface border-b border-border sticky top-0 z-40 px-6 py-3">
+            <div class="max-w-7xl mx-auto flex justify-between items-center">
+                <div class="flex items-center gap-2">
+                    <img id="header-logo" src="" class="w-8 h-8 rounded-lg object-cover" />
+                    <h1 id="header-title" class="text-lg font-black hidden sm:block"></h1>
+                </div>
+                <div class="flex items-center gap-1">
+                    <button onclick="toggleTheme()" class="p-2 hover:bg-brand-soft rounded-xl transition-colors text-text">
+                        <i id="theme-icon" class="ph-bold ph-moon text-xl"></i>
+                    </button>
+                    <button onclick="openModal('settings-modal')" class="p-2 hover:bg-brand-soft rounded-xl transition-colors text-text">
+                        <i class="ph-bold ph-gear text-xl"></i>
+                    </button>
+                    <button onclick="handleLogout()" class="p-2 text-danger hover:bg-danger-soft rounded-xl transition-colors">
+                        <i class="ph-bold ph-sign-out text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Dashboard -->
+        <main class="max-w-7xl mx-auto p-6 space-y-6">
+            <!-- Stats -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-surface p-6 rounded-3xl card-shadow border border-border group hover:border-brand/40 transition-all">
+                    <div class="flex items-center gap-3 mb-2">
+                        <div class="p-2 rounded-xl bg-brand-soft text-brand">
+                            <i class="ph-bold ph-trend-up text-xl"></i>
+                        </div>
+                        <p class="text-text-dim text-xs font-bold">إجمالي الديون</p>
+                    </div>
+                    <h2 class="text-2xl font-black text-brand"><span id="stat-debt">0</span> <span class="text-xs font-medium">ج.م</span></h2>
+                </div>
+                <div class="bg-surface p-6 rounded-3xl card-shadow border border-border group hover:border-success/40 transition-all">
+                    <div class="flex items-center gap-3 mb-2">
+                        <div class="p-2 rounded-xl bg-success-soft text-success">
+                            <i class="ph-bold ph-wallet text-xl"></i>
+                        </div>
+                        <p class="text-text-dim text-xs font-bold">إجمالي التحصيل</p>
+                    </div>
+                    <h2 class="text-2xl font-black text-success"><span id="stat-paid">0</span> <span class="text-xs font-medium">ج.م</span></h2>
+                </div>
+                <div class="bg-surface p-6 rounded-3xl card-shadow border border-border group hover:border-warning/40 transition-all">
+                    <div class="flex items-center gap-3 mb-2">
+                        <div class="p-2 rounded-xl bg-warning-soft text-warning">
+                            <i class="ph-bold ph-users text-xl"></i>
+                        </div>
+                        <p class="text-text-dim text-xs font-bold">عدد العملاء</p>
+                    </div>
+                    <h2 class="text-2xl font-black text-text" id="stat-clients">0</h2>
+                </div>
+            </div>
+
+            <!-- Controls -->
+            <div class="flex flex-col sm:flex-row gap-3 items-center justify-between bg-surface p-4 rounded-2xl border border-border shadow-sm">
+                <div class="relative w-full sm:max-w-xs">
+                    <i class="ph-bold ph-magnifying-glass absolute right-3 top-1/2 -translate-y-1/2 text-text-dim"></i>
+                    <input id="search-input" oninput="renderClients()" placeholder="ابحث عن عميل..." class="w-full bg-background rounded-xl py-2.5 pr-10 pl-3 text-sm outline-none text-text border border-border focus:border-brand transition-all placeholder:text-text-dim/60" />
+                </div>
+                <button onclick="openModal('add-client-modal')" class="w-full sm:w-auto bg-brand text-white px-6 py-2.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-brand/20 hover:bg-brand/90 transition-all">
+                    <i class="ph-bold ph-plus"></i> إضافة عميل
+                </button>
+            </div>
+
+            <!-- Clients Grid -->
+            <div id="clients-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Injected via JS -->
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    
+    <!-- Add Client Modal -->
+    <div id="add-client-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-overlay backdrop-blur-sm animate-fade" onclick="closeModal('add-client-modal')"></div>
+        <div class="relative bg-surface w-full max-w-sm rounded-3xl p-6 card-shadow animate-scale">
+            <h3 class="text-xl font-black mb-4 text-text">إضافة عميل</h3>
+            <form onsubmit="addClient(event)" class="space-y-4">
+                <input id="new-client-name" placeholder="الاسم" required class="w-full bg-background text-text p-3 rounded-xl outline-none border border-border focus:border-brand text-sm" />
+                <input id="new-client-total" type="number" placeholder="المبلغ" required class="w-full bg-background text-text p-3 rounded-xl outline-none border border-border focus:border-brand text-sm" />
+                <button type="submit" class="w-full bg-brand text-white py-3 rounded-xl font-bold text-sm">حفظ</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Transaction Modal (Pay / Debt) -->
+    <div id="transaction-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-overlay backdrop-blur-sm animate-fade" onclick="closeModal('transaction-modal')"></div>
+        <div class="relative bg-surface w-full max-w-sm rounded-3xl p-6 card-shadow text-center animate-scale">
+            <h3 id="tx-title" class="text-xl font-black mb-1 text-text"></h3>
+            <p id="tx-client-name" class="text-text-dim text-xs mb-4"></p>
+            <form onsubmit="submitTransaction(event)" class="space-y-3 mb-4">
+                <input id="tx-amount" type="number" required min="1" class="w-full bg-background text-text p-4 rounded-2xl text-2xl font-black text-center outline-none border border-border focus:border-brand" placeholder="0.00" />
+                <textarea id="tx-notes" class="w-full bg-background text-text p-3 rounded-xl text-sm outline-none border border-border focus:border-brand resize-none h-20" placeholder="ملاحظات إضافية (اختياري)..."></textarea>
+                <button id="tx-submit-btn" type="submit" class="w-full py-3 rounded-xl font-bold text-white">تأكيد</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- History Modal -->
+    <div id="history-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-overlay backdrop-blur-sm animate-fade" onclick="closeModal('history-modal')"></div>
+        <div class="relative bg-surface w-full max-w-lg rounded-3xl max-h-[90vh] flex flex-col overflow-hidden card-shadow animate-slide">
+            <div class="p-5 border-b border-border flex justify-between items-center no-print">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-brand-soft text-brand flex items-center justify-center">
+                        <i class="ph-bold ph-user text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 id="hist-client-name" class="font-black text-text"></h3>
+                        <p class="text-[10px] text-text-dim font-bold">سجل الحساب المالي المحدث لحظياً</p>
+                    </div>
+                </div>
+                <button onclick="closeModal('history-modal')" class="p-2 bg-background rounded-lg text-text-dim hover:text-text"><i class="ph-bold ph-x"></i></button>
+            </div>
+            
+            <div id="print-area" class="flex-1 overflow-y-auto p-5 space-y-6 bg-surface text-text">
+                <!-- PDF Header -->
+                <div class="mb-8 border-b-4 border-brand pb-8">
+                    <div class="flex justify-between items-start gap-4">
+                        <div class="text-right flex-1">
+                            <h2 id="print-company-name" class="text-3xl font-black text-brand mb-2"></h2>
+                            <p id="print-company-info" class="text-sm text-text-dim font-bold leading-relaxed whitespace-pre-line"></p>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <div class="p-2 bg-surface rounded-2xl shadow-lg border border-border">
+                                <img id="print-logo" src="" class="w-20 h-20 sm:w-24 sm:h-24 rounded-xl object-cover" />
+                            </div>
+                            <p class="text-[10px] font-bold text-brand mt-2">نظام الإدارة الإلكتروني</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-10 text-center relative">
+                        <div class="absolute inset-0 flex items-center"><div class="w-full border-t-2 border-brand-soft"></div></div>
+                        <div class="relative inline-block px-8 py-3 bg-brand text-white rounded-2xl font-black text-xl shadow-xl">كشف حساب مالي</div>
+                    </div>
+
+                    <div class="mt-10 grid grid-cols-2 gap-4">
+                        <div class="bg-background p-5 rounded-2xl border border-border">
+                            <p class="text-text-dim text-[10px] font-black mb-1 uppercase tracking-wider">السيد العميل</p>
+                            <p id="print-client-name" class="text-lg font-black text-text"></p>
+                        </div>
+                        <div class="bg-background p-5 rounded-2xl border border-border">
+                            <p class="text-text-dim text-[10px] font-black mb-1 uppercase tracking-wider">تاريخ التقرير</p>
+                            <p id="print-date" class="text-lg font-black text-text"></p>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 grid grid-cols-3 gap-3">
+                        <div class="bg-brand-soft p-4 rounded-2xl border border-brand/20 text-center">
+                            <p class="text-[10px] text-brand font-black mb-1">إجمالي المديونية</p>
+                            <p id="print-total" class="text-xl font-black text-brand"></p>
+                        </div>
+                        <div class="bg-success-soft p-4 rounded-2xl border border-success/20 text-center">
+                            <p class="text-[10px] text-success font-black mb-1">إجمالي التحصيل</p>
+                            <p id="print-paid" class="text-xl font-black text-success"></p>
+                        </div>
+                        <div class="bg-warning-soft p-4 rounded-2xl border border-warning/20 text-center">
+                            <p class="text-[10px] text-warning font-black mb-1">الرصيد الحالي</p>
+                            <p id="print-balance" class="text-xl font-black text-warning"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Transactions Table -->
+                <div class="space-y-4">
+                    <div class="flex items-center gap-3 mb-6 no-print">
+                        <div class="w-10 h-10 rounded-xl bg-brand text-white flex items-center justify-center shadow-lg shadow-brand/20">
+                            <i class="ph-bold ph-clock-counter-clockwise text-xl"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-black text-text">تفاصيل المعاملات</h4>
+                            <p class="text-[10px] text-text-dim font-bold">سجل الحركات المالية المسجلة</p>
+                        </div>
+                    </div>
+                    
+                    <div class="overflow-hidden rounded-2xl border border-border">
+                        <table class="w-full text-right text-sm">
+                            <thead class="bg-background text-text-dim font-black border-b border-border">
+                                <tr>
+                                    <th class="p-4">التاريخ</th>
+                                    <th class="p-4">نوع المعاملة</th>
+                                    <th class="p-4">المبلغ</th>
+                                    <th class="p-4 bg-brand-soft">الرصيد</th>
+                                    <th class="p-4 no-print">إجراء</th>
+                                </tr>
+                            </thead>
+                            <tbody id="history-table-body" class="divide-y divide-border">
+                                <!-- Injected via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="mt-16 grid grid-cols-2 gap-8 pt-8 border-t border-border">
+                    <div class="text-text-dim text-[10px] font-bold">
+                        <p class="mb-1">صدر هذا الكشف آلياً من نظام الإدارة</p>
+                        <p id="print-footer-date"></p>
+                        <p class="mt-4 text-[9px]">ملاحظة: يعتبر هذا الكشف صحيحاً ما لم يتم الاعتراض عليه خلال 3 أيام من تاريخه.</p>
+                        <div class="flex gap-2 mt-4 no-print">
+                            <button onclick="window.print()" class="flex-1 py-3 rounded-xl bg-brand text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-brand/20">
+                                <i class="ph-bold ph-printer text-lg"></i> طباعة كشف الحساب
+                            </button>
+                        </div>
+                    </div>
+                    <div class="text-center space-y-3">
+                        <p class="text-xs font-black text-text">توقيع وختم الإدارة</p>
+                        <div class="w-full h-24 border-2 border-dashed border-border rounded-2xl flex items-center justify-center">
+                            <img id="print-footer-logo" src="" class="w-16 h-16 opacity-10 grayscale dark:invert" />
+                        </div>
+                        <p id="print-footer-name" class="text-sm font-black text-brand"></p>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="admin-delete-zone" class="p-4 bg-danger-soft border-t border-danger/10 no-print hidden">
+                <button onclick="openDeleteConfirm()" class="w-full py-3 rounded-xl bg-danger text-white font-bold text-xs flex items-center justify-center gap-2 transition-all hover:bg-danger/90 shadow-lg shadow-danger/20">
+                    <i class="ph-bold ph-trash"></i> حذف العميل
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirm Modal -->
+    <div id="delete-confirm-modal" class="fixed inset-0 z-[110] hidden flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-overlay backdrop-blur-sm animate-fade" onclick="closeModal('delete-confirm-modal')"></div>
+        <div class="relative bg-surface w-full max-w-sm rounded-3xl p-6 card-shadow text-center animate-scale">
+            <div class="w-16 h-16 bg-danger-soft text-danger rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="ph-bold ph-warning-circle text-3xl"></i>
+            </div>
+            <h3 class="text-xl font-black mb-2 text-text">تأكيد الحذف</h3>
+            <p class="text-text-dim text-sm mb-6">هل أنت متأكد من حذف العميل <span id="delete-client-name" class="text-text font-bold"></span>؟ لا يمكن التراجع عن هذا الإجراء.</p>
+            <div class="flex gap-3">
+                <button onclick="closeModal('delete-confirm-modal')" class="flex-1 py-3 rounded-xl bg-background border border-border font-bold text-sm hover:bg-surface text-text transition-colors">إلغاء</button>
+                <button onclick="confirmDeleteClient()" class="flex-1 py-3 rounded-xl bg-danger text-white font-bold text-sm shadow-lg shadow-danger/20">تأكيد الحذف</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-overlay backdrop-blur-sm animate-fade" onclick="closeModal('settings-modal')"></div>
+        <div class="relative bg-surface w-full max-w-lg rounded-3xl max-h-[80vh] flex flex-col overflow-hidden card-shadow animate-scale">
+            <div class="p-5 border-b border-border flex justify-between items-center">
+                <h3 class="font-black text-text">الإعدادات</h3>
+                <button onclick="closeModal('settings-modal')" class="p-2 bg-background rounded-lg text-text-dim hover:text-text"><i class="ph-bold ph-x"></i></button>
+            </div>
+            <div class="flex-1 overflow-y-auto p-5">
+                <div class="flex gap-1 mb-6 bg-background p-1.5 rounded-2xl border border-border">
+                    <button onclick="setSettingsTab('general')" id="tab-general" class="flex-1 py-2.5 rounded-xl text-xs font-bold transition-all bg-brand text-white shadow-md">العامة</button>
+                    <button onclick="setSettingsTab('data')" id="tab-data" class="flex-1 py-2.5 rounded-xl text-xs font-bold transition-all text-text-dim hover:bg-surface">البيانات</button>
+                </div>
+                
+                <div id="settings-general">
+                    <form onsubmit="saveSettings(event)" class="space-y-4">
+                        <input id="set-name" placeholder="الاسم" class="w-full bg-background text-text p-3 rounded-xl text-sm outline-none border border-border focus:border-brand" />
+                        <input id="set-logo" placeholder="رابط اللوجو" class="w-full bg-background text-text p-3 rounded-xl text-sm outline-none border border-border focus:border-brand" />
+                        <input id="set-info" placeholder="معلومات التواصل" class="w-full bg-background text-text p-3 rounded-xl text-sm outline-none border border-border focus:border-brand" />
+                        <button type="submit" class="w-full bg-brand text-white py-3 rounded-xl font-bold text-sm">حفظ</button>
+                    </form>
+                </div>
+                
+                <div id="settings-data" class="hidden space-y-3">
+                    <button onclick="exportData()" class="w-full bg-brand text-white py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2"><i class="ph-bold ph-download-simple text-lg"></i> تصدير النسخة</button>
+                    <label class="w-full bg-success text-white py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 cursor-pointer">
+                        <i class="ph-bold ph-upload-simple text-lg"></i> استيراد النسخة
+                        <input type="file" class="hidden" onchange="importData(event)" accept=".json" />
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Logic -->
+    <script>
+        // --- State ---
+        const DB_KEY = 'mustafa_app_data';
+        let state = JSON.parse(localStorage.getItem(DB_KEY)) || {
+            clients: [],
+            config: {
+                name: 'مصنع مصطفى عبد الرحمن',
+                logo: 'https://cdn-icons-png.flaticon.com/512/1532/1532688.png',
+                info: 'تواصل: 0123456789'
+            }
+        };
+        let currentUser = JSON.parse(localStorage.getItem('mustafa_user')) || null;
+        let selectedClientId = null;
+        let currentTxType = null; // 'payment' | 'debt'
+
+        // --- Initialization ---
+        function init() {
+            applyTheme();
+            if (currentUser) {
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('main-app').classList.remove('hidden');
+                updateConfigUI();
+                renderClients();
+            } else {
+                document.getElementById('login-screen').classList.remove('hidden');
+                document.getElementById('main-app').classList.add('hidden');
+                document.getElementById('login-logo').src = state.config.logo;
+                document.getElementById('login-title').innerText = state.config.name;
+            }
+        }
+
+        function saveData() {
+            localStorage.setItem(DB_KEY, JSON.stringify(state));
+            renderClients();
+            updateConfigUI();
+        }
+
+        function generateId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2);
+        }
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            const bgColor = type === 'success' ? 'bg-success' : 'bg-danger';
+            toast.className = `${bgColor} text-white px-4 py-2 rounded-xl text-sm font-bold shadow-lg animate-slide flex items-center gap-2`;
+            toast.innerHTML = `<i class="ph-bold ${type === 'success' ? 'ph-check-circle' : 'ph-warning-circle'}"></i> ${message}`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(10px)';
+                toast.style.transition = 'all 0.3s';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // --- Theme ---
+        function applyTheme() {
+            const isDark = localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+            if (isDark) {
+                document.documentElement.classList.add('dark');
+                document.getElementById('theme-icon')?.classList.replace('ph-moon', 'ph-sun');
+            } else {
+                document.documentElement.classList.remove('dark');
+                document.getElementById('theme-icon')?.classList.replace('ph-sun', 'ph-moon');
+            }
+        }
+
+        function toggleTheme() {
+            const isDark = document.documentElement.classList.contains('dark');
+            localStorage.setItem('theme', isDark ? 'light' : 'dark');
+            applyTheme();
+        }
+
+        // --- Auth ---
+        function setLoginMode(mode) {
+            const btnG = document.getElementById('tab-google');
+            const btnC = document.getElementById('tab-custom');
+            const formG = document.getElementById('google-login-form');
+            const formC = document.getElementById('custom-login-form');
+
+            if (mode === 'google') {
+                btnG.className = 'flex-1 py-2.5 rounded-xl font-bold text-sm transition-all bg-brand text-white shadow-lg';
+                btnC.className = 'flex-1 py-2.5 rounded-xl font-bold text-sm transition-all text-text-dim hover:bg-surface';
+                formG.classList.remove('hidden');
+                formC.classList.add('hidden');
+            } else {
+                btnC.className = 'flex-1 py-2.5 rounded-xl font-bold text-sm transition-all bg-brand text-white shadow-lg';
+                btnG.className = 'flex-1 py-2.5 rounded-xl font-bold text-sm transition-all text-text-dim hover:bg-surface';
+                formC.classList.remove('hidden');
+                formG.classList.add('hidden');
+            }
+        }
+
+        function handleLogin(mode, e) {
+            if (e) e.preventDefault();
+            const errEl = document.getElementById('auth-error');
+            errEl.classList.add('hidden');
+
+            if (mode === 'google') {
+                // Mock Google Login
+                currentUser = { username: 'Admin User', role: 'admin' };
+                localStorage.setItem('mustafa_user', JSON.stringify(currentUser));
+                init();
+            } else {
+                const u = document.getElementById('login-username').value;
+                const p = document.getElementById('login-password').value;
+                if (u === 'احمد عبد الرحمن' && p === 'Shousha30') {
+                    currentUser = { username: 'احمد عبد الرحمن', role: 'admin' };
+                    localStorage.setItem('mustafa_user', JSON.stringify(currentUser));
+                    init();
+                } else {
+                    errEl.innerText = 'اسم المستخدم أو كلمة المرور غير صحيحة';
+                    errEl.classList.remove('hidden');
+                }
+            }
+        }
+
+        function handleLogout() {
+            localStorage.removeItem('mustafa_user');
+            currentUser = null;
+            init();
+        }
+
+        // --- UI Updates ---
+        function updateConfigUI() {
+            document.getElementById('header-logo').src = state.config.logo;
+            document.getElementById('header-title').innerText = state.config.name;
+            document.getElementById('set-name').value = state.config.name;
+            document.getElementById('set-logo').value = state.config.logo;
+            document.getElementById('set-info').value = state.config.info;
+        }
+
+        function renderClients() {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            const filtered = state.clients.filter(c => c.name.toLowerCase().includes(searchTerm));
+            
+            let totalDebt = 0;
+            let totalPaid = 0;
+            
+            const grid = document.getElementById('clients-grid');
+            grid.innerHTML = '';
+
+            state.clients.forEach(c => {
+                totalDebt += (c.total || 0) - (c.paid || 0);
+                totalPaid += (c.paid || 0);
+            });
+
+            document.getElementById('stat-debt').innerText = totalDebt.toLocaleString();
+            document.getElementById('stat-paid').innerText = totalPaid.toLocaleString();
+            document.getElementById('stat-clients').innerText = state.clients.length;
+
+            filtered.forEach(c => {
+                const remaining = (c.total || 0) - (c.paid || 0);
+                grid.innerHTML += `
+                    <div class="bg-surface p-5 sm:p-6 rounded-3xl card-shadow border border-border hover:border-brand/30 transition-all group">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-brand-soft flex items-center justify-center text-brand group-hover:bg-brand group-hover:text-white transition-all">
+                                    <i class="ph-bold ph-users text-xl"></i>
+                                </div>
+                                <h3 class="text-lg font-black truncate max-w-[150px] sm:max-w-none text-text">${c.name}</h3>
+                            </div>
+                            <button onclick="openHistory('${c.id}')" class="p-2 bg-background rounded-lg text-text-dim hover:text-brand transition-colors"><i class="ph-bold ph-clock-counter-clockwise text-lg"></i></button>
+                        </div>
+                        <div class="mb-6">
+                            <p class="text-text-dim text-[10px] font-black mb-1 uppercase tracking-wider">المبلغ المتبقي</p>
+                            <div class="text-2xl font-black text-brand">${remaining.toLocaleString()} <span class="text-xs font-medium">ج.م</span></div>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="openTransaction('${c.id}', 'payment')" class="flex-1 bg-success text-white py-2.5 rounded-xl font-bold text-xs shadow-lg shadow-success/20 hover:bg-success/90 hover:scale-[1.02] active:scale-95 transition-all">تحصيل</button>
+                            <button onclick="openTransaction('${c.id}', 'debt')" class="flex-1 bg-brand-soft text-brand border border-brand/20 py-2.5 rounded-xl font-bold text-xs hover:bg-brand hover:text-white transition-all">دين جديد</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // --- Actions ---
+        function addClient(e) {
+            e.preventDefault();
+            const name = document.getElementById('new-client-name').value;
+            const total = parseFloat(document.getElementById('new-client-total').value);
+            
+            const newClient = {
+                id: generateId(),
+                name,
+                total,
+                paid: 0,
+                history: [{
+                    date: new Date().toISOString(),
+                    type: 'debt',
+                    amount: total,
+                    user: currentUser.username
+                }]
+            };
+            
+            state.clients.push(newClient);
+            saveData();
+            closeModal('add-client-modal');
+            e.target.reset();
+            showToast('تم إضافة العميل بنجاح');
+        }
+
+        function openTransaction(clientId, type) {
+            selectedClientId = clientId;
+            currentTxType = type;
+            const client = state.clients.find(c => c.id === clientId);
+            
+            document.getElementById('tx-title').innerText = type === 'payment' ? 'تحصيل دفعة' : 'دين جديد';
+            document.getElementById('tx-client-name').innerText = client.name;
+            
+            const btn = document.getElementById('tx-submit-btn');
+            btn.className = `w-full py-3 rounded-xl font-bold text-white ${type === 'payment' ? 'bg-success' : 'bg-brand'}`;
+            
+            document.getElementById('tx-amount').value = '';
+            document.getElementById('tx-notes').value = '';
+            
+            openModal('transaction-modal');
+        }
+
+        function submitTransaction(e) {
+            e.preventDefault();
+            const amount = parseFloat(document.getElementById('tx-amount').value);
+            const notes = document.getElementById('tx-notes').value;
+            
+            const client = state.clients.find(c => c.id === selectedClientId);
+            if (!client) return;
+
+            if (currentTxType === 'payment') client.paid += amount;
+            else client.total += amount;
+
+            client.history.push({
+                date: new Date().toISOString(),
+                type: currentTxType,
+                amount,
+                notes,
+                user: currentUser.username
+            });
+
+            saveData();
+            closeModal('transaction-modal');
+            showToast(currentTxType === 'payment' ? 'تم تسجيل الدفعة بنجاح' : 'تم إضافة الدين بنجاح');
+        }
+
+        function openHistory(clientId) {
+            selectedClientId = clientId;
+            const client = state.clients.find(c => c.id === clientId);
+            if (!client) return;
+
+            document.getElementById('hist-client-name').innerText = client.name;
+            
+            // Print Setup
+            document.getElementById('print-company-name').innerText = state.config.name;
+            document.getElementById('print-company-info').innerText = state.config.info;
+            document.getElementById('print-logo').src = state.config.logo;
+            document.getElementById('print-client-name').innerText = client.name;
+            document.getElementById('print-date').innerText = new Date().toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' });
+            document.getElementById('print-total').innerText = (client.total || 0).toLocaleString();
+            document.getElementById('print-paid').innerText = (client.paid || 0).toLocaleString();
+            document.getElementById('print-balance').innerText = ((client.total || 0) - (client.paid || 0)).toLocaleString();
+            document.getElementById('print-footer-date').innerText = `بتاريخ: ${new Date().toLocaleString('ar-EG')}`;
+            document.getElementById('print-footer-logo').src = state.config.logo;
+            document.getElementById('print-footer-name').innerText = state.config.name;
+
+            // Admin Delete
+            const delZone = document.getElementById('admin-delete-zone');
+            if (currentUser.role === 'admin') delZone.classList.remove('hidden');
+            else delZone.classList.add('hidden');
+
+            // Table
+            let balance = 0;
+            const sortedHistory = [...client.history].sort((a, b) => new Date(a.date) - new Date(b.date));
+            const historyWithBalance = sortedHistory.map(h => {
+                balance += h.type === 'payment' ? -h.amount : h.amount;
+                return { ...h, balance };
+            }).reverse();
+
+            const tbody = document.getElementById('history-table-body');
+            tbody.innerHTML = '';
+            historyWithBalance.forEach((h, i) => {
+                const actualIndex = client.history.indexOf(sortedHistory[sortedHistory.length - 1 - i]);
+                const dateStr = new Date(h.date).toLocaleString('ar-EG').split(',')[0];
+                const isPay = h.type === 'payment';
+                
+                tbody.innerHTML += `
+                    <tr class="hover:bg-brand-soft transition-colors">
+                        <td class="p-4 text-text-dim font-bold text-xs">${dateStr}</td>
+                        <td class="p-4">
+                            <div class="flex items-center gap-2">
+                                <div class="w-2 h-2 rounded-full ${isPay ? 'bg-success' : 'bg-brand'}"></div>
+                                <span class="font-bold text-text">${isPay ? 'تحصيل دفعة' : 'إضافة مديونية'}</span>
+                            </div>
+                            ${h.notes ? `<p class="text-[10px] text-text-dim mt-1 font-medium">${h.notes}</p>` : ''}
+                        </td>
+                        <td class="p-4 font-black ${isPay ? 'text-success' : 'text-brand'}">
+                            ${isPay ? '-' : '+'}${h.amount.toLocaleString()}
+                        </td>
+                        <td class="p-4 font-black text-text bg-brand-soft">
+                            ${h.balance.toLocaleString()}
+                        </td>
+                        <td class="p-4 no-print">
+                            <div class="flex gap-1">
+                                <button onclick="window.print()" class="p-2 text-brand hover:bg-brand-soft rounded-xl transition-colors"><i class="ph-bold ph-printer text-lg"></i></button>
+                                <button onclick="deleteTransaction(${actualIndex})" class="p-2 text-danger hover:bg-danger-soft rounded-xl transition-colors"><i class="ph-bold ph-trash text-lg"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            openModal('history-modal');
+        }
+
+        function deleteTransaction(index) {
+            if (!confirm('هل أنت متأكد من حذف هذه المعاملة؟')) return;
+            const client = state.clients.find(c => c.id === selectedClientId);
+            const tx = client.history[index];
+            
+            if (tx.type === 'payment') client.paid -= tx.amount;
+            else client.total -= tx.amount;
+            
+            client.history.splice(index, 1);
+            saveData();
+            openHistory(selectedClientId); // refresh
+            showToast('تم حذف المعاملة بنجاح');
+        }
+
+        function openDeleteConfirm() {
+            const client = state.clients.find(c => c.id === selectedClientId);
+            document.getElementById('delete-client-name').innerText = `"${client.name}"`;
+            openModal('delete-confirm-modal');
+        }
+
+        function confirmDeleteClient() {
+            state.clients = state.clients.filter(c => c.id !== selectedClientId);
+            saveData();
+            closeModal('delete-confirm-modal');
+            closeModal('history-modal');
+            showToast('تم حذف العميل بنجاح');
+        }
+
+        // --- Settings ---
+        function setSettingsTab(tab) {
+            const btnGen = document.getElementById('tab-general');
+            const btnData = document.getElementById('tab-data');
+            const divGen = document.getElementById('settings-general');
+            const divData = document.getElementById('settings-data');
+
+            if (tab === 'general') {
+                btnGen.className = 'flex-1 py-2.5 rounded-xl text-xs font-bold transition-all bg-brand text-white shadow-md';
+                btnData.className = 'flex-1 py-2.5 rounded-xl text-xs font-bold transition-all text-text-dim hover:bg-surface';
+                divGen.classList.remove('hidden');
+                divData.classList.add('hidden');
+            } else {
+                btnData.className = 'flex-1 py-2.5 rounded-xl text-xs font-bold transition-all bg-brand text-white shadow-md';
+                btnGen.className = 'flex-1 py-2.5 rounded-xl text-xs font-bold transition-all text-text-dim hover:bg-surface';
+                divData.classList.remove('hidden');
+                divGen.classList.add('hidden');
+            }
+        }
+
+        function saveSettings(e) {
+            e.preventDefault();
+            state.config.name = document.getElementById('set-name').value;
+            state.config.logo = document.getElementById('set-logo').value;
+            state.config.info = document.getElementById('set-info').value;
+            saveData();
+            showToast('تم الحفظ بنجاح');
+        }
+
+        function exportData() {
+            const dataStr = JSON.stringify(state.clients, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            const link = document.createElement('a');
+            link.href = dataUri;
+            link.download = `backup_${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+            showToast('تم تصدير البيانات');
+        }
+
+        function importData(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                try {
+                    const data = JSON.parse(event.target.result);
+                    if (Array.isArray(data)) {
+                        state.clients = data;
+                        saveData();
+                        showToast('تم استيراد البيانات بنجاح');
+                    }
+                } catch (err) {
+                    showToast('خطأ في الملف', 'error');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // --- Modal Control ---
+        function openModal(id) {
+            document.getElementById(id).classList.remove('hidden');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+        }
+
+        // Boot
+        init();
+    </script>
+</body>
+</html>
