@@ -3,50 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام إدارة الديون والعربون | النسخة الاحترافية</title>
+    <title>مصنع مصطفى عبد الرحمن - إدارة الديون</title>
     
-    <!-- PWA Meta Tags -->
-    <meta name="theme-color" content="#2563eb">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="إدارة الديون">
-    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/1532/1532688.png">
-
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
-    <!-- Libraries -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-
-    <!-- Firebase SDK (Modular) -->
-
     <script>
         tailwind.config = {
             darkMode: 'class',
             theme: {
                 extend: {
-                    colors: {
-                        brand: '#2563eb',
-                        surface: 'var(--surface)',
-                        background: 'var(--background)',
-                        border: 'var(--border)',
-                        text: 'var(--text-main)',
-                        'text-dim': 'var(--text-dim)',
-                        success: '#10b981',
-                        warning: '#f59e0b',
-                        danger: '#ef4444',
-                    },
                     fontFamily: {
                         sans: ['Tajawal', 'sans-serif'],
                     },
+                    colors: {
+                        brand: '#3b82f6',
+                        'brand-soft': 'rgba(59, 130, 246, 0.1)',
+                        success: '#22c55e',
+                        'success-soft': 'rgba(34, 197, 94, 0.1)',
+                        danger: '#ef4444',
+                        'danger-soft': 'rgba(239, 68, 68, 0.1)',
+                        warning: '#f59e0b',
+                        'warning-soft': 'rgba(245, 158, 11, 0.1)',
+                        background: 'var(--bg-background)',
+                        surface: 'var(--bg-surface)',
+                        border: 'var(--border-color)',
+                        text: 'var(--text-main)',
+                        'text-dim': 'var(--text-dim)',
+                        overlay: 'rgba(0,0,0,0.5)'
+                    }
                 }
             }
         }
@@ -54,683 +46,777 @@
 
     <style>
         :root {
-            --background: #f8fafc;
-            --surface: #ffffff;
-            --border: #e2e8f0;
+            --bg-background: #f8fafc;
+            --bg-surface: #ffffff;
+            --border-color: #e2e8f0;
             --text-main: #0f172a;
             --text-dim: #64748b;
         }
         .dark {
-            --background: #020617;
-            --surface: #0f172a;
-            --border: #1e293b;
-            --text-main: #f1f5f9;
+            --bg-background: #0f172a;
+            --bg-surface: #1e293b;
+            --border-color: #334155;
+            --text-main: #f8fafc;
             --text-dim: #94a3b8;
         }
         body {
-            font-family: 'Tajawal', sans-serif;
-            background-color: var(--background);
+            background-color: var(--bg-background);
             color: var(--text-main);
-            transition: all 0.3s ease;
-            margin: 0;
-            direction: rtl;
+            transition: background-color 0.3s, color 0.3s;
         }
         .card-shadow {
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .dark .card-shadow {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+        }
         
-        .pulse-live {
-            width: 8px;
-            height: 8px;
-            background: #10b981;
-            border-radius: 50%;
-            display: inline-block;
-            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
-            animation: pulse 2s infinite;
-        }
-        @keyframes pulse {
-            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
-            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
-            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 10px; }
+        
+        /* Animations */
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes scaleIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        
+        .animate-fade { animation: fadeIn 0.2s ease-out forwards; }
+        .animate-scale { animation: scaleIn 0.2s ease-out forwards; }
+        .animate-slide { animation: slideUp 0.3s ease-out forwards; }
+        
+        /* Print Styles */
+        @media print {
+            body * { visibility: hidden; }
+            #print-area, #print-area * { visibility: visible; }
+            #print-area { position: absolute; left: 0; top: 0; width: 100%; }
+            .no-print { display: none !important; }
         }
     </style>
-  <script type="module" crossorigin src="/assets/index-B1FOpLtV.js"></script>
 </head>
-<body>
-    <div id="root"></div>
+<body class="min-h-screen pb-20">
 
-    <script type="text/babel">
-        const { useState, useEffect, useRef, useMemo } = React;
-        const { motion, AnimatePresence } = window.Motion || window.FramerMotion || { motion: (p) => <div {...p} />, AnimatePresence: (p) => <>{p.children}</> };
+    <!-- Toast Notification -->
+    <div id="toast-container" class="fixed bottom-4 left-1/2 -translate-x-1/2 z-[200] flex flex-col gap-2"></div>
 
-        // --- Firebase Shim (Modular to Compat) ---
-        const { db: firestore, auth: authInstance, googleProvider: googleProviderInstance, collection, doc, getDoc, getDocs, onSnapshot, addDoc, updateDoc, deleteDoc, query, where, orderBy, serverTimestamp, increment, arrayUnion, setDoc, signOut, signInWithPopup, onAuthStateChanged } = window.fb;
+    <!-- Login Screen -->
+    <div id="login-screen" class="min-h-screen flex items-center justify-center p-4 bg-background hidden">
+        <div class="bg-surface p-8 rounded-[40px] card-shadow w-full max-w-md text-center border border-border">
+            <img id="login-logo" src="" class="w-20 h-20 mx-auto mb-6 rounded-2xl object-cover" />
+            <h1 id="login-title" class="text-2xl font-black mb-2"></h1>
+            <p class="text-text-dim mb-8 text-sm">نظام إدارة الديون والتحصيل</p>
+            
+            <div id="auth-error" class="bg-danger-soft text-danger p-4 rounded-2xl mb-6 text-xs font-bold border border-danger/20 hidden"></div>
+            
+            <div class="flex bg-background p-1.5 rounded-2xl mb-8 border border-border">
+                <button onclick="setLoginMode('google')" id="tab-google" class="flex-1 py-2.5 rounded-xl font-bold text-sm transition-all bg-brand text-white shadow-lg">جوجل</button>
+                <button onclick="setLoginMode('custom')" id="tab-custom" class="flex-1 py-2.5 rounded-xl font-bold text-sm transition-all text-text-dim hover:bg-surface">يدوي</button>
+            </div>
+            
+            <div id="google-login-form">
+                <button onclick="handleLogin('google')" class="w-full bg-brand text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-brand/20">
+                    <i class="ph-bold ph-google-logo text-lg"></i> دخول بجوجل (محاكاة)
+                </button>
+            </div>
+            
+            <form id="custom-login-form" onsubmit="handleLogin('custom', event)" class="space-y-4 hidden">
+                <input id="login-username" placeholder="اسم المستخدم" class="w-full bg-background p-4 rounded-xl outline-none border border-border focus:border-brand text-sm transition-all" required />
+                <input id="login-password" type="password" placeholder="كلمة المرور" class="w-full bg-background p-4 rounded-xl outline-none border border-border focus:border-brand text-sm transition-all" required />
+                <button type="submit" class="w-full bg-brand text-white py-4 rounded-xl font-bold shadow-xl shadow-brand/20 hover:bg-brand/90 transition-all">دخول</button>
+            </form>
+        </div>
+    </div>
 
-        const wrapDocSnap = (snap) => {
-            if (snap && typeof snap.exists === 'function') {
-                const originalExists = snap.exists.bind(snap);
-                Object.defineProperty(snap, 'exists', { 
-                    get: () => originalExists(),
-                    enumerable: true,
-                    configurable: true
-                });
-            }
-            return snap;
-        };
+    <!-- Main Application -->
+    <div id="main-app" class="hidden">
+        <!-- Header -->
+        <header class="bg-surface border-b border-border sticky top-0 z-40 px-6 py-3">
+            <div class="max-w-7xl mx-auto flex justify-between items-center">
+                <div class="flex items-center gap-2">
+                    <img id="header-logo" src="" class="w-8 h-8 rounded-lg object-cover" />
+                    <h1 id="header-title" class="text-lg font-black hidden sm:block"></h1>
+                </div>
+                <div class="flex items-center gap-1">
+                    <button onclick="toggleTheme()" class="p-2 hover:bg-brand-soft rounded-xl transition-colors text-text">
+                        <i id="theme-icon" class="ph-bold ph-moon text-xl"></i>
+                    </button>
+                    <button onclick="openModal('settings-modal')" class="p-2 hover:bg-brand-soft rounded-xl transition-colors text-text">
+                        <i class="ph-bold ph-gear text-xl"></i>
+                    </button>
+                    <button onclick="handleLogout()" class="p-2 text-danger hover:bg-danger-soft rounded-xl transition-colors">
+                        <i class="ph-bold ph-sign-out text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
 
-        const db = {
-            collection: (path) => ({
-                orderBy: (field) => ({
-                    onSnapshot: (cb) => onSnapshot(query(collection(firestore, path), orderBy(field)), (snap) => {
-                        snap.docs.forEach(wrapDocSnap);
-                        cb(snap);
-                    })
-                }),
-                onSnapshot: (cb) => onSnapshot(collection(firestore, path), (snap) => {
-                    snap.docs.forEach(wrapDocSnap);
-                    cb(snap);
-                }),
-                doc: (id) => {
-                    const d = id ? doc(firestore, path, id) : doc(collection(firestore, path));
-                    return {
-                        id: d.id,
-                        get: () => getDoc(d).then(wrapDocSnap),
-                        onSnapshot: (cb) => onSnapshot(d, (snap) => cb(wrapDocSnap(snap))),
-                        update: (data) => updateDoc(d, data),
-                        delete: () => deleteDoc(d),
-                        set: (data, opts) => setDoc(d, data, opts)
-                    }
-                },
-                add: (data) => addDoc(collection(firestore, path), data),
-                where: (f, o, v) => ({
-                    where: (f2, o2, v2) => ({
-                        get: () => getDocs(query(collection(firestore, path), where(f, o, v), where(f2, o2, v2))).then(snap => {
-                            snap.docs.forEach(wrapDocSnap);
-                            return snap;
-                        })
-                    }),
-                    get: () => getDocs(query(collection(firestore, path), where(f, o, v))).then(snap => {
-                        snap.docs.forEach(wrapDocSnap);
-                        return snap;
-                    })
-                })
-            }),
-            settings: () => {}
-        };
+        <!-- Dashboard -->
+        <main class="max-w-7xl mx-auto p-6 space-y-6">
+            <!-- Stats -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-surface p-6 rounded-3xl card-shadow border border-border group hover:border-brand/40 transition-all">
+                    <div class="flex items-center gap-3 mb-2">
+                        <div class="p-2 rounded-xl bg-brand-soft text-brand">
+                            <i class="ph-bold ph-trend-up text-xl"></i>
+                        </div>
+                        <p class="text-text-dim text-xs font-bold">إجمالي الديون</p>
+                    </div>
+                    <h2 class="text-2xl font-black text-brand"><span id="stat-debt">0</span> <span class="text-xs font-medium">ج.م</span></h2>
+                </div>
+                <div class="bg-surface p-6 rounded-3xl card-shadow border border-border group hover:border-success/40 transition-all">
+                    <div class="flex items-center gap-3 mb-2">
+                        <div class="p-2 rounded-xl bg-success-soft text-success">
+                            <i class="ph-bold ph-wallet text-xl"></i>
+                        </div>
+                        <p class="text-text-dim text-xs font-bold">إجمالي التحصيل</p>
+                    </div>
+                    <h2 class="text-2xl font-black text-success"><span id="stat-paid">0</span> <span class="text-xs font-medium">ج.م</span></h2>
+                </div>
+                <div class="bg-surface p-6 rounded-3xl card-shadow border border-border group hover:border-warning/40 transition-all">
+                    <div class="flex items-center gap-3 mb-2">
+                        <div class="p-2 rounded-xl bg-warning-soft text-warning">
+                            <i class="ph-bold ph-users text-xl"></i>
+                        </div>
+                        <p class="text-text-dim text-xs font-bold">عدد العملاء</p>
+                    </div>
+                    <h2 class="text-2xl font-black text-text" id="stat-clients">0</h2>
+                </div>
+            </div>
 
-        const auth = {
-            onAuthStateChanged: (cb) => onAuthStateChanged(authInstance, cb),
-            signInWithPopup: (provider) => signInWithPopup(authInstance, provider),
-            signOut: () => signOut(authInstance),
-            get currentUser() { return authInstance.currentUser; }
-        };
+            <!-- Controls -->
+            <div class="flex flex-col sm:flex-row gap-3 items-center justify-between bg-surface p-4 rounded-2xl border border-border shadow-sm">
+                <div class="relative w-full sm:max-w-xs">
+                    <i class="ph-bold ph-magnifying-glass absolute right-3 top-1/2 -translate-y-1/2 text-text-dim"></i>
+                    <input id="search-input" oninput="renderClients()" placeholder="ابحث عن عميل..." class="w-full bg-background rounded-xl py-2.5 pr-10 pl-3 text-sm outline-none text-text border border-border focus:border-brand transition-all placeholder:text-text-dim/60" />
+                </div>
+                <button onclick="openModal('add-client-modal')" class="w-full sm:w-auto bg-brand text-white px-6 py-2.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-brand/20 hover:bg-brand/90 transition-all">
+                    <i class="ph-bold ph-plus"></i> إضافة عميل
+                </button>
+            </div>
 
-        const googleProvider = googleProviderInstance;
+            <!-- Clients Grid -->
+            <div id="clients-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Injected via JS -->
+            </div>
+        </main>
+    </div>
 
-        const firebase = {
-            firestore: {
-                FieldValue: {
-                    increment: (val) => increment(val),
-                    arrayUnion: (val) => arrayUnion(val),
-                    serverTimestamp: () => serverTimestamp()
-                }
-            }
-        };
+    <!-- Modals -->
+    
+    <!-- Add Client Modal -->
+    <div id="add-client-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-overlay backdrop-blur-sm animate-fade" onclick="closeModal('add-client-modal')"></div>
+        <div class="relative bg-surface w-full max-w-sm rounded-3xl p-6 card-shadow animate-scale">
+            <h3 class="text-xl font-black mb-4 text-text">إضافة عميل</h3>
+            <form onsubmit="addClient(event)" class="space-y-4">
+                <input id="new-client-name" placeholder="الاسم" required class="w-full bg-background text-text p-3 rounded-xl outline-none border border-border focus:border-brand text-sm" />
+                <input id="new-client-total" type="number" placeholder="المبلغ" required class="w-full bg-background text-text p-3 rounded-xl outline-none border border-border focus:border-brand text-sm" />
+                <button type="submit" class="w-full bg-brand text-white py-3 rounded-xl font-bold text-sm">حفظ</button>
+            </form>
+        </div>
+    </div>
 
-        // --- Icons Component ---
-        const Icon = ({ name, className }) => {
-            useEffect(() => { if (window.lucide) window.lucide.createIcons(); }, [name]);
-            return <i data-lucide={name} className={className}></i>;
-        };
+    <!-- Transaction Modal (Pay / Debt) -->
+    <div id="transaction-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-overlay backdrop-blur-sm animate-fade" onclick="closeModal('transaction-modal')"></div>
+        <div class="relative bg-surface w-full max-w-sm rounded-3xl p-6 card-shadow text-center animate-scale">
+            <h3 id="tx-title" class="text-xl font-black mb-1 text-text"></h3>
+            <p id="tx-client-name" class="text-text-dim text-xs mb-4"></p>
+            <form onsubmit="submitTransaction(event)" class="space-y-3 mb-4">
+                <input id="tx-amount" type="number" required min="1" class="w-full bg-background text-text p-4 rounded-2xl text-2xl font-black text-center outline-none border border-border focus:border-brand" placeholder="0.00" />
+                <textarea id="tx-notes" class="w-full bg-background text-text p-3 rounded-xl text-sm outline-none border border-border focus:border-brand resize-none h-20" placeholder="ملاحظات إضافية (اختياري)..."></textarea>
+                <button id="tx-submit-btn" type="submit" class="w-full py-3 rounded-xl font-bold text-white">تأكيد</button>
+            </form>
+        </div>
+    </div>
 
-        function App() {
-            const [user, setUser] = useState(null);
-            const [isAuthorized, setIsAuthorized] = useState(false);
-            const [authError, setAuthError] = useState(null);
-            const [loginMode, setLoginMode] = useState('google');
-            const [username, setUsername] = useState('');
-            const [password, setPassword] = useState('');
-            const [clients, setClients] = useState([]);
-            const [config, setConfig] = useState({
+    <!-- History Modal -->
+    <div id="history-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-overlay backdrop-blur-sm animate-fade" onclick="closeModal('history-modal')"></div>
+        <div class="relative bg-surface w-full max-w-lg rounded-3xl max-h-[90vh] flex flex-col overflow-hidden card-shadow animate-slide">
+            <div class="p-5 border-b border-border flex justify-between items-center no-print">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-brand-soft text-brand flex items-center justify-center">
+                        <i class="ph-bold ph-user text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 id="hist-client-name" class="font-black text-text"></h3>
+                        <p class="text-[10px] text-text-dim font-bold">سجل الحساب المالي المحدث لحظياً</p>
+                    </div>
+                </div>
+                <button onclick="closeModal('history-modal')" class="p-2 bg-background rounded-lg text-text-dim hover:text-text"><i class="ph-bold ph-x"></i></button>
+            </div>
+            
+            <div id="print-area" class="flex-1 overflow-y-auto p-5 space-y-6 bg-surface text-text">
+                <!-- PDF Header -->
+                <div class="mb-8 border-b-4 border-brand pb-8">
+                    <div class="flex justify-between items-start gap-4">
+                        <div class="text-right flex-1">
+                            <h2 id="print-company-name" class="text-3xl font-black text-brand mb-2"></h2>
+                            <p id="print-company-info" class="text-sm text-text-dim font-bold leading-relaxed whitespace-pre-line"></p>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <div class="p-2 bg-surface rounded-2xl shadow-lg border border-border">
+                                <img id="print-logo" src="" class="w-20 h-20 sm:w-24 sm:h-24 rounded-xl object-cover" />
+                            </div>
+                            <p class="text-[10px] font-bold text-brand mt-2">نظام الإدارة الإلكتروني</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-10 text-center relative">
+                        <div class="absolute inset-0 flex items-center"><div class="w-full border-t-2 border-brand-soft"></div></div>
+                        <div class="relative inline-block px-8 py-3 bg-brand text-white rounded-2xl font-black text-xl shadow-xl">كشف حساب مالي</div>
+                    </div>
+
+                    <div class="mt-10 grid grid-cols-2 gap-4">
+                        <div class="bg-background p-5 rounded-2xl border border-border">
+                            <p class="text-text-dim text-[10px] font-black mb-1 uppercase tracking-wider">السيد العميل</p>
+                            <p id="print-client-name" class="text-lg font-black text-text"></p>
+                        </div>
+                        <div class="bg-background p-5 rounded-2xl border border-border">
+                            <p class="text-text-dim text-[10px] font-black mb-1 uppercase tracking-wider">تاريخ التقرير</p>
+                            <p id="print-date" class="text-lg font-black text-text"></p>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 grid grid-cols-3 gap-3">
+                        <div class="bg-brand-soft p-4 rounded-2xl border border-brand/20 text-center">
+                            <p class="text-[10px] text-brand font-black mb-1">إجمالي المديونية</p>
+                            <p id="print-total" class="text-xl font-black text-brand"></p>
+                        </div>
+                        <div class="bg-success-soft p-4 rounded-2xl border border-success/20 text-center">
+                            <p class="text-[10px] text-success font-black mb-1">إجمالي التحصيل</p>
+                            <p id="print-paid" class="text-xl font-black text-success"></p>
+                        </div>
+                        <div class="bg-warning-soft p-4 rounded-2xl border border-warning/20 text-center">
+                            <p class="text-[10px] text-warning font-black mb-1">الرصيد الحالي</p>
+                            <p id="print-balance" class="text-xl font-black text-warning"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Transactions Table -->
+                <div class="space-y-4">
+                    <div class="flex items-center gap-3 mb-6 no-print">
+                        <div class="w-10 h-10 rounded-xl bg-brand text-white flex items-center justify-center shadow-lg shadow-brand/20">
+                            <i class="ph-bold ph-clock-counter-clockwise text-xl"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-black text-text">تفاصيل المعاملات</h4>
+                            <p class="text-[10px] text-text-dim font-bold">سجل الحركات المالية المسجلة</p>
+                        </div>
+                    </div>
+                    
+                    <div class="overflow-hidden rounded-2xl border border-border">
+                        <table class="w-full text-right text-sm">
+                            <thead class="bg-background text-text-dim font-black border-b border-border">
+                                <tr>
+                                    <th class="p-4">التاريخ</th>
+                                    <th class="p-4">نوع المعاملة</th>
+                                    <th class="p-4">المبلغ</th>
+                                    <th class="p-4 bg-brand-soft">الرصيد</th>
+                                    <th class="p-4 no-print">إجراء</th>
+                                </tr>
+                            </thead>
+                            <tbody id="history-table-body" class="divide-y divide-border">
+                                <!-- Injected via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="mt-16 grid grid-cols-2 gap-8 pt-8 border-t border-border">
+                    <div class="text-text-dim text-[10px] font-bold">
+                        <p class="mb-1">صدر هذا الكشف آلياً من نظام الإدارة</p>
+                        <p id="print-footer-date"></p>
+                        <p class="mt-4 text-[9px]">ملاحظة: يعتبر هذا الكشف صحيحاً ما لم يتم الاعتراض عليه خلال 3 أيام من تاريخه.</p>
+                        <div class="flex gap-2 mt-4 no-print">
+                            <button onclick="window.print()" class="flex-1 py-3 rounded-xl bg-brand text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-brand/20">
+                                <i class="ph-bold ph-printer text-lg"></i> طباعة كشف الحساب
+                            </button>
+                        </div>
+                    </div>
+                    <div class="text-center space-y-3">
+                        <p class="text-xs font-black text-text">توقيع وختم الإدارة</p>
+                        <div class="w-full h-24 border-2 border-dashed border-border rounded-2xl flex items-center justify-center">
+                            <img id="print-footer-logo" src="" class="w-16 h-16 opacity-10 grayscale dark:invert" />
+                        </div>
+                        <p id="print-footer-name" class="text-sm font-black text-brand"></p>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="admin-delete-zone" class="p-4 bg-danger-soft border-t border-danger/10 no-print hidden">
+                <button onclick="openDeleteConfirm()" class="w-full py-3 rounded-xl bg-danger text-white font-bold text-xs flex items-center justify-center gap-2 transition-all hover:bg-danger/90 shadow-lg shadow-danger/20">
+                    <i class="ph-bold ph-trash"></i> حذف العميل
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirm Modal -->
+    <div id="delete-confirm-modal" class="fixed inset-0 z-[110] hidden flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-overlay backdrop-blur-sm animate-fade" onclick="closeModal('delete-confirm-modal')"></div>
+        <div class="relative bg-surface w-full max-w-sm rounded-3xl p-6 card-shadow text-center animate-scale">
+            <div class="w-16 h-16 bg-danger-soft text-danger rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="ph-bold ph-warning-circle text-3xl"></i>
+            </div>
+            <h3 class="text-xl font-black mb-2 text-text">تأكيد الحذف</h3>
+            <p class="text-text-dim text-sm mb-6">هل أنت متأكد من حذف العميل <span id="delete-client-name" class="text-text font-bold"></span>؟ لا يمكن التراجع عن هذا الإجراء.</p>
+            <div class="flex gap-3">
+                <button onclick="closeModal('delete-confirm-modal')" class="flex-1 py-3 rounded-xl bg-background border border-border font-bold text-sm hover:bg-surface text-text transition-colors">إلغاء</button>
+                <button onclick="confirmDeleteClient()" class="flex-1 py-3 rounded-xl bg-danger text-white font-bold text-sm shadow-lg shadow-danger/20">تأكيد الحذف</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-overlay backdrop-blur-sm animate-fade" onclick="closeModal('settings-modal')"></div>
+        <div class="relative bg-surface w-full max-w-lg rounded-3xl max-h-[80vh] flex flex-col overflow-hidden card-shadow animate-scale">
+            <div class="p-5 border-b border-border flex justify-between items-center">
+                <h3 class="font-black text-text">الإعدادات</h3>
+                <button onclick="closeModal('settings-modal')" class="p-2 bg-background rounded-lg text-text-dim hover:text-text"><i class="ph-bold ph-x"></i></button>
+            </div>
+            <div class="flex-1 overflow-y-auto p-5">
+                <div class="flex gap-1 mb-6 bg-background p-1.5 rounded-2xl border border-border">
+                    <button onclick="setSettingsTab('general')" id="tab-general" class="flex-1 py-2.5 rounded-xl text-xs font-bold transition-all bg-brand text-white shadow-md">العامة</button>
+                    <button onclick="setSettingsTab('data')" id="tab-data" class="flex-1 py-2.5 rounded-xl text-xs font-bold transition-all text-text-dim hover:bg-surface">البيانات</button>
+                </div>
+                
+                <div id="settings-general">
+                    <form onsubmit="saveSettings(event)" class="space-y-4">
+                        <input id="set-name" placeholder="الاسم" class="w-full bg-background text-text p-3 rounded-xl text-sm outline-none border border-border focus:border-brand" />
+                        <input id="set-logo" placeholder="رابط اللوجو" class="w-full bg-background text-text p-3 rounded-xl text-sm outline-none border border-border focus:border-brand" />
+                        <input id="set-info" placeholder="معلومات التواصل" class="w-full bg-background text-text p-3 rounded-xl text-sm outline-none border border-border focus:border-brand" />
+                        <button type="submit" class="w-full bg-brand text-white py-3 rounded-xl font-bold text-sm">حفظ</button>
+                    </form>
+                </div>
+                
+                <div id="settings-data" class="hidden space-y-3">
+                    <button onclick="exportData()" class="w-full bg-brand text-white py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2"><i class="ph-bold ph-download-simple text-lg"></i> تصدير النسخة</button>
+                    <label class="w-full bg-success text-white py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 cursor-pointer">
+                        <i class="ph-bold ph-upload-simple text-lg"></i> استيراد النسخة
+                        <input type="file" class="hidden" onchange="importData(event)" accept=".json" />
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Logic -->
+    <script>
+        // --- State ---
+        const DB_KEY = 'mustafa_app_data';
+        let state = JSON.parse(localStorage.getItem(DB_KEY)) || {
+            clients: [],
+            config: {
                 name: 'مصنع مصطفى عبد الرحمن',
                 logo: 'https://cdn-icons-png.flaticon.com/512/1532/1532688.png',
                 info: 'تواصل: 0123456789'
-            });
-            const [loading, setLoading] = useState(true);
-            const [searchTerm, setSearchTerm] = useState('');
-            const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-            const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-            const [selectedClientId, setSelectedClientId] = useState(null);
-            const [isPayModalOpen, setIsPayModalOpen] = useState(false);
-            const [isAddDebtModalOpen, setIsAddDebtModalOpen] = useState(false);
-            const [isHistoryOpen, setIsHistoryOpen] = useState(false);
-            const [amount, setAmount] = useState('');
-            const [toast, setToast] = useState(null);
-            const [whitelist, setWhitelist] = useState([]);
-            const [appUsers, setAppUsers] = useState([]);
-            const [settingsTab, setSettingsTab] = useState('general');
-            const [isDarkMode, setIsDarkMode] = useState(() => localStorage.getItem('theme') === 'dark');
-
-            const selectedClient = useMemo(() => clients.find(c => c.id === selectedClientId), [clients, selectedClientId]);
-
-            useEffect(() => {
-                document.documentElement.classList.toggle('dark', isDarkMode);
-                localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
-            }, [isDarkMode]);
-
-            // Auth Listener
-            useEffect(() => {
-                const unsubscribe = auth.onAuthStateChanged(async (u) => {
-                    if (u) {
-                        try {
-                            const whitelistDoc = await db.collection('settings').doc('whitelist').get();
-                            const allowedEmails = whitelistDoc.exists ? whitelistDoc.data().emails || [] : [];
-                            const defaultAdmin = "saeedmohamed131846@gmail.com";
-                            
-                            if (u.email === defaultAdmin || allowedEmails.includes(u.email)) {
-                                setUser({ uid: u.uid, displayName: u.displayName || u.email, email: u.email, role: u.email === defaultAdmin ? 'admin' : 'user' });
-                                setIsAuthorized(true);
-                            } else {
-                                setAuthError('عذراً، هذا الحساب غير مصرح له بالدخول.');
-                                auth.signOut();
-                            }
-                        } catch (error) { 
-                            console.warn('Whitelist check failed:', error);
-                            if (u.email === "saeedmohamed131846@gmail.com") {
-                                setUser({ uid: u.uid, displayName: u.displayName || u.email, email: u.email, role: 'admin' });
-                                setIsAuthorized(true);
-                            } else {
-                                setAuthError('فشل التحقق من الصلاحيات. حاول مرة أخرى.');
-                            }
-                        }
-                    } else {
-                        const savedUser = localStorage.getItem('customUser');
-                        if (savedUser) {
-                            setUser(JSON.parse(savedUser));
-                            setIsAuthorized(true);
-                        } else {
-                            setUser(null);
-                            setIsAuthorized(false);
-                            setClients([]); // Clear data on logout
-                        }
-                    }
-                    setLoading(false);
-                });
-                return () => unsubscribe();
-            }, []);
-
-            // Real-time Data Listeners
-            useEffect(() => {
-                if (!isAuthorized) return;
-
-                // Connection Test
-                db.collection('test').doc('connection').get()
-                    .then(() => console.log('Firestore connected successfully to:', 'ai-studio-5cff9370-970c-408a-bf68-0eb47a873db5'))
-                    .catch(err => {
-                        if (err.message.includes('not-found') || err.message.includes('default')) {
-                             console.error('CRITICAL: Still hitting (default) database. SDK initialization failed.');
-                        }
-                        console.error('Firestore connection error:', err);
-                    });
-
-                const unsubClients = db.collection('clients').orderBy('name').onSnapshot(snap => {
-                    setClients(snap.docs.map(d => ({ id: d.id, ...d.data() })));
-                });
-
-                const unsubConfig = db.collection('config').doc('main').onSnapshot(doc => {
-                    if (doc.exists) setConfig(doc.data());
-                });
-
-                const unsubWhitelist = db.collection('settings').doc('whitelist').onSnapshot(doc => {
-                    if (doc.exists) setWhitelist(doc.data().emails || []);
-                });
-
-                let unsubUsers = () => {};
-                if (user?.role === 'admin') {
-                    unsubUsers = db.collection('users').onSnapshot(snap => {
-                        setAppUsers(snap.docs.map(d => ({ id: d.id, ...d.data() })));
-                    });
-                }
-
-                return () => {
-                    unsubClients();
-                    unsubConfig();
-                    unsubWhitelist();
-                    unsubUsers();
-                };
-            }, [isAuthorized, user?.role]);
-
-            const showToast = (message, type = 'success') => {
-                setToast({ message, type });
-                setTimeout(() => setToast(null), 3000);
-            };
-
-            const handleLogout = () => {
-                auth.signOut();
-                localStorage.removeItem('customUser');
-                setUser(null);
-                setIsAuthorized(false);
-                setClients([]);
-                setSelectedClientId(null);
-            };
-
-            const handleTransaction = async (type) => {
-                const val = parseFloat(amount);
-                if (!selectedClient || isNaN(val)) return;
-
-                const clientRef = db.collection('clients').doc(selectedClient.id);
-                const newTrans = { 
-                    amount: val, 
-                    user: user.displayName, 
-                    date: new Date().toLocaleString('ar-EG'), 
-                    type 
-                };
-
-                // Atomic updates using increment
-                const updates = type === 'payment' 
-                    ? { paid: firebase.firestore.FieldValue.increment(val) }
-                    : { total: firebase.firestore.FieldValue.increment(val) };
-
-                await clientRef.update({
-                    ...updates,
-                    history: firebase.firestore.FieldValue.arrayUnion(newTrans)
-                });
-
-                setIsPayModalOpen(false);
-                setIsAddDebtModalOpen(false);
-                setAmount('');
-                showToast(type === 'payment' ? 'تم تسجيل التحصيل بنجاح' : 'تم تسجيل الدين بنجاح');
-            };
-
-            const addClient = async (e) => {
-                e.preventDefault();
-                const name = e.target.name.value;
-                const total = parseFloat(e.target.total.value);
-                if (!name || isNaN(total)) return;
-                
-                const initialTrans = { 
-                    amount: total, 
-                    user: user.displayName, 
-                    date: new Date().toLocaleString('ar-EG'), 
-                    type: 'debt' 
-                };
-
-                await db.collection('clients').add({
-                    name, 
-                    total, 
-                    paid: 0, 
-                    history: [initialTrans],
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    createdBy: user.displayName
-                });
-                setIsAddModalOpen(false);
-                showToast('تم إضافة العميل بنجاح');
-            };
-
-            const deleteTransaction = async (index) => {
-                const t = selectedClient?.history?.[index];
-                if (!t) return;
-                
-                const newH = [...selectedClient.history];
-                newH.splice(index, 1);
-                
-                const updates = t.type === 'payment' 
-                    ? { paid: firebase.firestore.FieldValue.increment(-t.amount) }
-                    : { total: firebase.firestore.FieldValue.increment(-t.amount) };
-
-                try {
-                    await db.collection('clients').doc(selectedClientId).update({
-                        ...updates,
-                        history: newH
-                    });
-                    showToast('تم حذف المعاملة وتحديث الأرصدة');
-                } catch (error) {
-                    showToast('فشل الحذف، حاول مرة أخرى', 'error');
-                }
-            };
-
-            const calculateRunningBalance = (history) => {
-                let current = 0;
-                return [...(history || [])].map(h => {
-                    if (h.type === 'payment') current -= h.amount;
-                    else current += h.amount;
-                    return { ...h, balance: current };
-                }).reverse();
-            };
-
-            if (loading) return (
-                <div className="flex items-center justify-center h-screen bg-background text-brand">
-                    <div className="w-12 h-12 border-4 border-brand border-t-transparent rounded-full animate-spin"></div>
-                </div>
-            );
-
-            if (!isAuthorized) {
-                return (
-                    <div className="min-h-screen flex items-center justify-center p-4 bg-background">
-                        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-surface p-10 rounded-[40px] card-shadow w-full max-w-md text-center border border-border">
-                            <img src={config.logo} className="w-24 h-24 mx-auto mb-8 rounded-3xl shadow-lg object-cover" />
-                            <h1 className="text-3xl font-black mb-2">{config.name}</h1>
-                            <p className="text-text-dim mb-8 text-sm font-bold">نظام الإدارة والتحصيل اللحظي</p>
-                            {authError && <div className="bg-danger/10 text-danger p-4 rounded-2xl mb-6 text-sm font-bold">{authError}</div>}
-                            <div className="flex bg-background p-1 rounded-2xl mb-6">
-                                <button onClick={() => setLoginMode('google')} className={`flex-1 py-3 rounded-xl font-bold transition-all ${loginMode === 'google' ? 'bg-brand text-white shadow-lg' : 'text-text-dim'}`}>جوجل</button>
-                                <button onClick={() => setLoginMode('custom')} className={`flex-1 py-3 rounded-xl font-bold transition-all ${loginMode === 'custom' ? 'bg-brand text-white shadow-lg' : 'text-text-dim'}`}>يدوي</button>
-                            </div>
-                            {loginMode === 'google' ? (
-                                <button onClick={() => auth.signInWithPopup(googleProvider)} className="w-full bg-brand text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-3 shadow-xl shadow-blue-500/20">
-                                    <Icon name="log-in" /> دخول بحساب جوجل
-                                </button>
-                            ) : (
-                                <form onSubmit={async (e) => {
-                                    e.preventDefault();
-                                    if (username === 'احمد عبد الرحمن' && password === 'Shousha30') {
-                                        const admin = { uid: 'admin-1', displayName: 'احمد عبد الرحمن', role: 'admin' };
-                                        setUser(admin); setIsAuthorized(true); localStorage.setItem('customUser', JSON.stringify(admin));
-                                    } else {
-                                        const snap = await db.collection('users').where('username', '==', username).where('password', '==', password).get();
-                                        if (!snap.empty) {
-                                            const u = { uid: snap.docs[0].id, displayName: snap.docs[0].data().username, role: snap.docs[0].data().role || 'user' };
-                                            setUser(u); setIsAuthorized(true); localStorage.setItem('customUser', JSON.stringify(u));
-                                        } else setAuthError('بيانات الدخول غير صحيحة');
-                                    }
-                                }} className="space-y-4">
-                                    <input placeholder="اسم المستخدم" value={username} onChange={e => setUsername(e.target.value)} className="w-full bg-background p-4 rounded-2xl outline-none border-2 border-transparent focus:border-brand" required />
-                                    <input type="password" placeholder="كلمة المرور" value={password} onChange={e => setPassword(e.target.value)} className="w-full bg-background p-4 rounded-2xl outline-none border-2 border-transparent focus:border-brand" required />
-                                    <button type="submit" className="w-full bg-brand text-white py-4 rounded-2xl font-bold shadow-xl">دخول</button>
-                                </form>
-                            )}
-                        </motion.div>
-                    </div>
-                );
             }
+        };
+        let currentUser = JSON.parse(localStorage.getItem('mustafa_user')) || null;
+        let selectedClientId = null;
+        let currentTxType = null; // 'payment' | 'debt'
 
-            const filteredClients = clients.filter(c => c.name.toLowerCase().includes(searchTerm.toLowerCase()));
-            const totalDebt = clients.reduce((a, c) => { const b = (c.total || 0) - (c.paid || 0); return a + (b > 0 ? b : 0); }, 0);
-            const totalArboun = clients.reduce((a, c) => { const b = (c.total || 0) - (c.paid || 0); return a + (b < 0 ? Math.abs(b) : 0); }, 0);
-
-            return (
-                <div className="min-h-screen pb-24">
-                    <header className="bg-surface/80 backdrop-blur-md border-b border-border sticky top-0 z-40 px-6 py-4">
-                        <div className="max-w-7xl mx-auto flex justify-between items-center">
-                            <div className="flex items-center gap-3">
-                                <img src={config.logo} className="w-10 h-10 rounded-xl object-cover" />
-                                <div className="flex flex-col">
-                                    <h1 className="text-xl font-black">{config.name}</h1>
-                                    <div className="flex items-center gap-1"><span className="pulse-live"></span><span className="text-[10px] font-bold text-success">متصل لحظياً</span></div>
-                                </div>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <button onClick={() => setIsDarkMode(!isDarkMode)} className="p-3 hover:bg-background rounded-2xl transition-colors"><Icon name={isDarkMode ? 'sun' : 'moon'} className="w-5 h-5" /></button>
-                                <button onClick={() => setIsSettingsOpen(true)} className="p-3 hover:bg-background rounded-2xl transition-colors"><Icon name="settings" className="w-5 h-5" /></button>
-                                <button onClick={handleLogout} className="p-3 text-danger hover:bg-danger/10 rounded-2xl transition-colors"><Icon name="log-out" className="w-5 h-5" /></button>
-                            </div>
-                        </div>
-                    </header>
-
-                    <main className="max-w-7xl mx-auto p-6 space-y-8">
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <div className="bg-brand p-8 rounded-[35px] shadow-2xl shadow-brand/20 text-white relative overflow-hidden">
-                                <div className="relative z-10"><p className="opacity-80 text-sm font-bold mb-2">إجمالي الديون المستحقة</p><h2 className="text-4xl font-black">{totalDebt.toLocaleString()} ج.م</h2></div>
-                                <Icon name="trending-up" className="absolute -bottom-4 -left-4 w-32 h-32 opacity-10 rotate-12" />
-                            </div>
-                            <div className="bg-success p-8 rounded-[35px] shadow-2xl shadow-success/20 text-white relative overflow-hidden">
-                                <div className="relative z-10"><p className="opacity-80 text-sm font-bold mb-2">إجمالي العربون (رصيد العملاء)</p><h2 className="text-4xl font-black">{totalArboun.toLocaleString()} ج.م</h2></div>
-                                <Icon name="wallet" className="absolute -bottom-4 -left-4 w-32 h-32 opacity-10 rotate-12" />
-                            </div>
-                            <div className="bg-surface p-8 rounded-[35px] card-shadow border border-border flex flex-col items-center justify-center">
-                                <p className="text-text-dim text-sm font-bold mb-2">عدد العملاء</p><h2 className="text-4xl font-black">{clients.length}</h2>
-                            </div>
-                        </div>
-
-                        <div className="bg-surface p-4 rounded-[30px] card-shadow border border-border flex flex-col sm:flex-row gap-4">
-                            <div className="relative flex-1">
-                                <Icon name="search" className="absolute right-4 top-1/2 -translate-y-1/2 text-text-dim w-5 h-5 opacity-40" />
-                                <input placeholder="ابحث عن عميل..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="w-full bg-background border-2 border-transparent focus:border-brand rounded-2xl py-4 pr-12 pl-4 outline-none transition-all" />
-                            </div>
-                            <button onClick={() => setIsAddModalOpen(true)} className="bg-brand text-white px-10 py-4 rounded-2xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-blue-500/20"><Icon name="plus" /> إضافة عميل</button>
-                        </div>
-
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                            <AnimatePresence>
-                                {filteredClients.map(c => {
-                                    const b = (c.total || 0) - (c.paid || 0);
-                                    return (
-                                        <motion.div layout initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} key={c.id} className="bg-surface p-7 rounded-[35px] card-shadow border border-border hover:border-brand/50 transition-all group">
-                                            <div className="flex justify-between items-start mb-6">
-                                                <h3 className="text-xl font-black group-hover:text-brand transition-colors">{c.name}</h3>
-                                                <button onClick={() => { setSelectedClientId(c.id); setIsHistoryOpen(true); }} className="p-3 bg-background rounded-2xl text-text-dim hover:text-brand transition-all"><Icon name="history" /></button>
-                                            </div>
-                                            <div className="mb-8">
-                                                <p className="text-text-dim text-xs font-bold mb-1 uppercase tracking-wider">{b >= 0 ? "المبلغ المتبقي" : "العربون الحالي"}</p>
-                                                <div className={`text-3xl font-black ${b >= 0 ? 'text-brand' : 'text-success'}`}>{Math.abs(b).toLocaleString()} <span className="text-sm font-medium">ج.م</span></div>
-                                            </div>
-                                            <div className="flex gap-3">
-                                                <button onClick={() => { setSelectedClientId(c.id); setIsPayModalOpen(true); }} className="flex-1 bg-success text-white py-4 rounded-2xl font-bold shadow-lg shadow-success/20 hover:brightness-110 active:scale-95 transition-all">تحصيل</button>
-                                                <button onClick={() => { setSelectedClientId(c.id); setIsAddDebtModalOpen(true); }} className="flex-1 bg-background border-2 border-border py-4 rounded-2xl font-bold hover:bg-border/20 active:scale-95 transition-all">دين جديد</button>
-                                            </div>
-                                        </motion.div>
-                                    );
-                                })}
-                            </AnimatePresence>
-                        </div>
-                    </main>
-
-                    <AnimatePresence>
-                        {isAddModalOpen && (
-                            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
-                                <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="bg-surface w-full max-w-md rounded-[40px] p-10 card-shadow">
-                                    <h3 className="text-2xl font-black mb-8 text-center">إضافة عميل جديد</h3>
-                                    <form onSubmit={addClient} className="space-y-5">
-                                        <input name="name" placeholder="اسم العميل" required className="w-full bg-background p-4 rounded-2xl outline-none border-2 border-transparent focus:border-brand" />
-                                        <input name="total" type="number" placeholder="المبلغ الابتدائي" required className="w-full bg-background p-4 rounded-2xl outline-none border-2 border-transparent focus:border-brand" />
-                                        <div className="flex gap-4 mt-8"><button type="submit" className="flex-1 bg-brand text-white py-4 rounded-2xl font-bold shadow-lg">حفظ</button><button type="button" onClick={() => setIsAddModalOpen(false)} className="flex-1 bg-background py-4 rounded-2xl font-bold">إلغاء</button></div>
-                                    </form>
-                                </motion.div>
-                            </div>
-                        )}
-
-                        {(isPayModalOpen || isAddDebtModalOpen) && (
-                            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
-                                <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="bg-surface w-full max-w-sm rounded-[40px] p-10 card-shadow text-center">
-                                    <h3 className="text-2xl font-black mb-2">{isPayModalOpen ? 'تحصيل مبلغ' : 'إضافة دين'}</h3>
-                                    <p className="text-text-dim mb-8 font-bold">{selectedClient?.name}</p>
-                                    <input type="number" value={amount} onChange={e => setAmount(e.target.value)} className="w-full bg-background p-6 rounded-[30px] text-5xl font-black text-center outline-none mb-8 border-2 border-transparent focus:border-brand" placeholder="0" autoFocus />
-                                    <div className="flex gap-4">
-                                        <button onClick={() => handleTransaction(isPayModalOpen ? 'payment' : 'debt')} className={`flex-1 py-4 rounded-2xl font-bold text-white shadow-xl ${isPayModalOpen ? 'bg-success shadow-success/30' : 'bg-brand shadow-brand/30'}`}>تأكيد</button>
-                                        <button onClick={() => { setIsPayModalOpen(false); setIsAddDebtModalOpen(false); setAmount(''); }} className="flex-1 bg-background py-4 rounded-2xl font-bold">تراجع</button>
-                                    </div>
-                                </motion.div>
-                            </div>
-                        )}
-
-                        {isHistoryOpen && selectedClient && (
-                            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
-                                <motion.div initial={{ y: 50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 50, opacity: 0 }} className="bg-surface w-full max-w-4xl rounded-[45px] max-h-[90vh] flex flex-col overflow-hidden card-shadow">
-                                    <div className="p-8 border-b border-border flex justify-between items-center">
-                                        <div className="flex items-center gap-4">
-                                            <div className="w-12 h-12 rounded-2xl bg-brand/10 text-brand flex items-center justify-center"><Icon name="user" className="w-6 h-6" /></div>
-                                            <div><h3 className="text-xl font-black">{selectedClient.name}</h3><p className="text-xs text-text-dim font-bold">سجل الحساب المالي المحدث لحظياً</p></div>
-                                        </div>
-                                        <div className="flex gap-2">
-                                            <button onClick={() => {
-                                                const element = document.getElementById('invoice-print-area');
-                                                const opt = {
-                                                    margin: 0,
-                                                    filename: `كشف_حساب_${selectedClient.name}.pdf`,
-                                                    image: { type: 'jpeg', quality: 1 },
-                                                    html2canvas: { 
-                                                        scale: 2, 
-                                                        useCORS: true, 
-                                                        letterRendering: true,
-                                                        backgroundColor: '#ffffff',
-                                                        logging: false
-                                                    },
-                                                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                                                    pagebreak: { mode: ['css', 'legacy'] }
-                                                };
-                                                // Trigger print with a small delay to ensure rendering
-                                                setTimeout(() => {
-                                                    html2pdf().from(element).set(opt).save();
-                                                }, 500);
-                                            }} className="p-3 bg-brand text-white rounded-2xl flex items-center gap-2 px-5 font-bold shadow-lg shadow-blue-500/20"><Icon name="printer" /> طباعة كشف حساب</button>
-                                            {user.role === 'admin' && <button onClick={async () => { await db.collection('clients').doc(selectedClientId).delete(); setIsHistoryOpen(false); showToast('تم الحذف'); }} className="p-3 bg-danger/10 text-danger rounded-2xl hover:bg-danger hover:text-white transition-all"><Icon name="trash-2" /></button>}
-                                            <button onClick={() => setIsHistoryOpen(false)} className="p-3 bg-background rounded-2xl hover:bg-border transition-all"><Icon name="x" className="w-6 h-6" /></button>
-                                        </div>
-                                    </div>
-                                    <div className="flex-1 overflow-y-auto p-8">
-                                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10">
-                                            <div className="bg-brand/5 p-6 rounded-[30px] text-center border border-brand/10"><p className="text-xs font-bold text-text-dim mb-2">إجمالي المديونية</p><p className="text-2xl font-black text-brand">{(selectedClient.total || 0).toLocaleString()} ج.م</p></div>
-                                            <div className="bg-success/5 p-6 rounded-[30px] text-center border border-success/10"><p className="text-xs font-bold text-text-dim mb-2">إجمالي التحصيل</p><p className="text-2xl font-black text-success">{(selectedClient.paid || 0).toLocaleString()} ج.م</p></div>
-                                            <div className="bg-danger/5 p-6 rounded-[30px] text-center border border-danger/10">
-                                                <p className="text-xs font-bold text-text-dim mb-2">الرصيد النهائي</p>
-                                                <p className={`text-2xl font-black ${ (selectedClient.total - selectedClient.paid) >= 0 ? 'text-danger' : 'text-success'}`}>
-                                                    {Math.abs(selectedClient.total - selectedClient.paid).toLocaleString()} ج.م
-                                                    <span className="text-xs block opacity-60">{(selectedClient.total - selectedClient.paid) >= 0 ? '(متبقي عليه)' : '(عربون له)'}</span>
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <div className="rounded-[30px] border border-border overflow-hidden">
-                                            <table className="w-full text-right">
-                                                <thead className="bg-background text-text-dim text-xs font-black uppercase tracking-widest border-b border-border"><tr><th className="p-5">التاريخ</th><th className="p-5">النوع</th><th className="p-5">المبلغ</th><th className="p-5">الرصيد التراكمي</th><th className="p-5 text-center">إجراءات</th></tr></thead>
-                                                <tbody className="divide-y divide-border">
-                                                    {calculateRunningBalance(selectedClient.history).map((h, i) => (
-                                                        <tr key={i} className="hover:bg-background/50 transition-colors group">
-                                                            <td className="p-5 text-xs font-bold text-text-dim">{h.date}</td>
-                                                            <td className="p-5"><span className={`px-4 py-1.5 rounded-full text-[10px] font-black ${h.type === 'payment' ? 'bg-success/10 text-success' : 'bg-brand/10 text-brand'}`}>{h.type === 'payment' ? 'تحصيل' : 'دين'}</span></td>
-                                                            <td className={`p-5 font-black text-lg ${h.type === 'payment' ? 'text-success' : 'text-brand'}`}>{h.type === 'payment' ? '-' : '+'}{h.amount.toLocaleString()}</td>
-                                                            <td className={`p-5 font-black text-lg ${h.balance >= 0 ? 'text-text' : 'text-success'}`}>{Math.abs(h.balance).toLocaleString()}</td>
-                                                            <td className="p-5"><div className="flex justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity"><button onClick={() => deleteTransaction(selectedClient.history.length - 1 - i)} className="p-2.5 bg-danger/10 text-danger rounded-xl hover:bg-danger hover:text-white transition-all"><Icon name="trash-2" className="w-4 h-4" /></button></div></td>
-                                                        </tr>
-                                                    ))}
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </motion.div>
-                            </div>
-                        )}
-
-                        {/* Hidden Invoice Template for PDF */}
-                        <div style={{ position: 'absolute', top: '-20000px', left: 0, width: '210mm', zIndex: -1000 }}>
-                            <div id="invoice-print-area" style={{ 
-                                width: '210mm', 
-                                minHeight: '297mm',
-                                background: '#ffffff', 
-                                padding: '15mm',
-                                direction: 'rtl',
-                                fontFamily: 'Tajawal, sans-serif',
-                                color: '#000000',
-                                boxSizing: 'border-box'
-                            }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '3px solid #2563eb', paddingBottom: '5mm', marginBottom: '5mm' }}>
-                                    <div style={{ textAlign: 'right' }}>
-                                        <h1 style={{ fontSize: '26pt', fontWeight: '900', margin: '0', color: '#2563eb' }}>{config.name}</h1>
-                                        <p style={{ margin: '2mm 0 0 0', fontSize: '13pt', fontWeight: '700' }}>تواصل: {config.info}</p>
-                                    </div>
-                                    {config.logo && <img src={config.logo} style={{ width: '25mm', height: '25mm', borderRadius: '5mm', objectFit: 'cover' }} referrerPolicy="no-referrer" />}
-                                </div>
-                                <div style={{ textAlign: 'center', marginBottom: '5mm' }}>
-                                    <h2 style={{ fontSize: '22pt', fontWeight: '900', textDecoration: 'underline', margin: '0 0 2mm 0' }}>كشف حساب مالي</h2>
-                                    <p style={{ margin: '0', fontSize: '11pt', color: '#64748b' }}>تاريخ التقرير: {new Date().toLocaleDateString('ar-EG')}</p>
-                                </div>
-                                <div style={{ marginBottom: '5mm', background: '#f8fafc', padding: '6mm', borderRadius: '6mm', border: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <p style={{ margin: '0', fontSize: '16pt' }}><strong>إلى السيد/ة:</strong> <span style={{ color: '#2563eb', fontWeight: '900' }}>{selectedClient?.name}</span></p>
-                                    <div style={{ textAlign: 'left' }}>
-                                        <p style={{ margin: '0', fontSize: '11pt', color: '#64748b' }}>الرصيد الحالي:</p>
-                                        <p style={{ margin: '0', fontSize: '18pt', fontWeight: '900', color: (selectedClient?.total - selectedClient?.paid) >= 0 ? '#ef4444' : '#10b981' }}>
-                                            {Math.abs((selectedClient?.total || 0) - (selectedClient?.paid || 0)).toLocaleString()} ج.م
-                                            <span style={{ fontSize: '9pt', marginRight: '5px' }}>{(selectedClient?.total - selectedClient?.paid) >= 0 ? '(مطلوب)' : '(له)'}</span>
-                                        </p>
-                                    </div>
-                                </div>
-                                <h3 style={{ fontSize: '16pt', fontWeight: '900', marginBottom: '4mm', borderRight: '6px solid #2563eb', paddingRight: '12px', color: '#1e293b' }}>تفاصيل حركة الحساب:</h3>
-                                <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: '0', textAlign: 'right', tableLayout: 'fixed', border: '1px solid #e2e8f0', borderRadius: '5mm', overflow: 'hidden' }}>
-                                    <thead style={{ display: 'table-header-group', background: '#2563eb', color: '#fff' }}>
-                                        <tr>
-                                            <th style={{ padding: '6mm', fontSize: '14pt', width: '25%', borderBottom: '2px solid #1d4ed8' }}>التاريخ</th>
-                                            <th style={{ padding: '6mm', fontSize: '14pt', width: '35%', borderBottom: '2px solid #1d4ed8' }}>البيان</th>
-                                            <th style={{ padding: '6mm', fontSize: '14pt', width: '20%', borderBottom: '2px solid #1d4ed8' }}>المبلغ</th>
-                                            <th style={{ padding: '6mm', fontSize: '14pt', width: '20%', borderBottom: '2px solid #1d4ed8' }}>الرصيد</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {calculateRunningBalance(selectedClient?.history).map((h, i) => (
-                                            <tr key={i} style={{ background: i % 2 === 0 ? '#ffffff' : '#f8fafc', pageBreakInside: 'avoid' }}>
-                                                <td style={{ padding: '5mm', borderBottom: '1px solid #e2e8f0', fontSize: '12pt', color: '#64748b' }}>{h.date}</td>
-                                                <td style={{ padding: '5mm', borderBottom: '1px solid #e2e8f0', fontWeight: '600', fontSize: '13pt', color: '#1e293b' }}>{h.type === 'payment' ? 'تحصيل نقدي' : 'سحب بضاعة (دين)'}</td>
-                                                <td style={{ padding: '5mm', borderBottom: '1px solid #e2e8f0', fontWeight: '800', fontSize: '14pt', color: h.type === 'payment' ? '#10b981' : '#2563eb' }}>{h.type === 'payment' ? '-' : '+'}{h.amount.toLocaleString()}</td>
-                                                <td style={{ padding: '5mm', borderBottom: '1px solid #e2e8f0', fontWeight: '800', fontSize: '14pt', color: '#0f172a' }}>{Math.abs(h.balance).toLocaleString()}</td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                                <div style={{ marginTop: '20mm', textAlign: 'center', fontSize: '13pt', color: '#64748b', borderTop: '3px dashed #e2e8f0', paddingTop: '15mm' }}>
-                                    <p style={{ fontWeight: '700', color: '#000', marginBottom: '10mm', fontSize: '16pt' }}>شكراً لتعاملكم مع {config.name}</p>
-                                    <p>تم استخراج هذا التقرير آلياً بتاريخ {new Date().toLocaleString('ar-EG')}</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        {isSettingsOpen && (
-                            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
-                                <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="bg-surface w-full max-w-md rounded-[40px] p-10 card-shadow">
-                                    <div className="flex justify-between items-center mb-10"><h3 className="text-2xl font-black">الإعدادات</h3><button onClick={() => setIsSettingsOpen(false)} className="p-2 bg-background rounded-xl hover:bg-border transition-all"><Icon name="x" className="w-5 h-5" /></button></div>
-                                    <div className="flex gap-1 mb-6 bg-background p-1 rounded-xl overflow-x-auto no-scrollbar">
-                                        <button onClick={() => setSettingsTab('general')} className={`flex-1 py-2 px-4 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${settingsTab === 'general' ? 'bg-brand text-white' : 'text-text-dim'}`}>العامة</button>
-                                        <button onClick={() => setSettingsTab('data')} className={`flex-1 py-2 px-4 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${settingsTab === 'data' ? 'bg-brand text-white' : 'text-text-dim'}`}>البيانات</button>
-                                        {user.role === 'admin' && <><button onClick={() => setSettingsTab('users')} className={`flex-1 py-2 px-4 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${settingsTab === 'users' ? 'bg-brand text-white' : 'text-text-dim'}`}>المستخدمين</button><button onClick={() => setSettingsTab('google')} className={`flex-1 py-2 px-4 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${settingsTab === 'google' ? 'bg-brand text-white' : 'text-text-dim'}`}>جوجل</button></>}
-                                    </div>
-                                    <div className="space-y-6 max-h-[50vh] overflow-y-auto no-scrollbar">
-                                        {settingsTab === 'general' && (
-                                            <form onSubmit={async e => { e.preventDefault(); const formData = new FormData(e.currentTarget); await db.collection('config').doc('main').set({ name: formData.get('name'), logo: formData.get('logo'), info: formData.get('info') }); setIsSettingsOpen(false); showToast('تم الحفظ'); }} className="space-y-4">
-                                                <input name="name" defaultValue={config.name} placeholder="اسم المصنع" className="w-full bg-background p-3 rounded-xl text-sm outline-none border-2 border-transparent focus:border-brand" />
-                                                <input name="logo" defaultValue={config.logo} placeholder="رابط اللوجو" className="w-full bg-background p-3 rounded-xl text-sm outline-none border-2 border-transparent focus:border-brand" />
-                                                <textarea name="info" defaultValue={config.info} placeholder="معلومات التواصل" className="w-full bg-background p-3 rounded-xl text-sm outline-none border-2 border-transparent focus:border-brand h-24" />
-                                                <button type="submit" className="w-full bg-brand text-white py-3 rounded-xl font-bold shadow-lg">حفظ التغييرات</button>
-                                            </form>
-                                        )}
-                                        {settingsTab === 'data' && (
-                                            <div className="space-y-3">
-                                                <button onClick={() => { const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(clients)); const dl = document.createElement('a'); dl.href = dataStr; dl.download = "backup.json"; dl.click(); setIsSettingsOpen(false); showToast('تم التصدير'); }} className="w-full bg-brand text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-3 shadow-lg"><Icon name="download" /> تصدير نسخة احتياطية</button>
-                                                <label className="w-full bg-success text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-3 cursor-pointer shadow-lg"><Icon name="upload" /> استيراد نسخة احتياطية<input type="file" className="hidden" onChange={(e) => { const file = e.target.files[0]; const reader = new FileReader(); reader.onload = async (ev) => { try { const data = JSON.parse(ev.target.result); for (const item of data) await db.collection('clients').doc(item.id || db.collection('clients').doc().id).set(item, { merge: true }); setIsSettingsOpen(false); showToast('تم استيراد البيانات بنجاح'); } catch (e) { showToast('خطأ في الملف', 'error'); } }; reader.readAsText(file); }} /></label>
-                                            </div>
-                                        )}
-                                        {settingsTab === 'users' && (
-                                            <div className="space-y-4">
-                                                <form onSubmit={async e => { e.preventDefault(); const formData = new FormData(e.currentTarget); await db.collection('users').add({ username: formData.get('u'), password: formData.get('p'), role: 'user' }); e.currentTarget.reset(); setIsSettingsOpen(false); showToast('تم إضافة المستخدم بنجاح'); }} className="space-y-2">
-                                                    <input name="u" placeholder="الاسم" className="w-full bg-background p-3 rounded-xl text-sm outline-none border-2 border-transparent focus:border-brand" required />
-                                                    <input name="p" placeholder="كلمة المرور" className="w-full bg-background p-3 rounded-xl text-sm outline-none border-2 border-transparent focus:border-brand" required />
-                                                    <button type="submit" className="w-full bg-brand text-white py-3 rounded-xl font-bold shadow-lg">إضافة مستخدم</button>
-                                                </form>
-                                                <div className="space-y-1">{appUsers.map(u => (<div key={u.id} className="flex justify-between items-center p-3 bg-background rounded-xl text-xs"><span>{u.username}</span><button onClick={async () => { await db.collection('users').doc(u.id).delete(); }} className="text-danger hover:bg-danger/10 p-2 rounded-lg transition-all"><Icon name="trash-2" className="w-4 h-4" /></button></div>))}</div>
-                                            </div>
-                                        )}
-                                        {settingsTab === 'google' && (
-                                            <div className="space-y-4">
-                                                <form onSubmit={async e => { e.preventDefault(); const email = e.target.email.value.toLowerCase().trim(); const newWhitelist = [...whitelist, email]; await db.collection('settings').doc('whitelist').set({ emails: newWhitelist }); e.target.reset(); setIsSettingsOpen(false); showToast('تمت إضافة البريد المصرح له'); }} className="flex gap-2"><input name="email" type="email" placeholder="example@gmail.com" className="flex-1 bg-background p-3 rounded-xl text-sm outline-none border-2 border-transparent focus:border-brand" required /><button type="submit" className="bg-brand text-white px-4 rounded-xl font-bold text-xs">إضافة</button></form>
-                                                <div className="space-y-1">{whitelist.map(email => (<div key={email} className="flex justify-between items-center p-4 bg-background rounded-xl text-xs"><span className="truncate max-w-[200px]">{email}</span>{email !== "saeedmohamed131846@gmail.com" && <button onClick={async () => { const newWhitelist = whitelist.filter(e => e !== email); await db.collection('settings').doc('whitelist').set({ emails: newWhitelist }); }} className="text-danger hover:bg-danger/10 p-2 rounded-lg transition-all"><Icon name="trash-2" className="w-4 h-4" /></button>}</div>))}</div>
-                                            </div>
-                                        )}
-                                    </div>
-                                </motion.div>
-                            </div>
-                        )}
-                    </AnimatePresence>
-
-                    <AnimatePresence>
-                        {toast && (
-                            <motion.div initial={{ y: 50, opacity: 0, x: '-50%' }} animate={{ y: 0, opacity: 1, x: '-50%' }} exit={{ y: 50, opacity: 0, x: '-50%' }} className={`fixed bottom-10 left-1/2 px-10 py-5 rounded-[25px] shadow-2xl text-white font-black z-[100] flex items-center gap-4 ${toast.type === 'success' ? 'bg-success shadow-success/30' : 'bg-danger shadow-danger/30'}`}>
-                                <Icon name={toast.type === 'success' ? 'check-circle' : 'alert-circle'} />{toast.message}
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
-                </div>
-            );
+        // --- Initialization ---
+        function init() {
+            applyTheme();
+            if (currentUser) {
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('main-app').classList.remove('hidden');
+                updateConfigUI();
+                renderClients();
+            } else {
+                document.getElementById('login-screen').classList.remove('hidden');
+                document.getElementById('main-app').classList.add('hidden');
+                document.getElementById('login-logo').src = state.config.logo;
+                document.getElementById('login-title').innerText = state.config.name;
+            }
         }
 
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
+        function saveData() {
+            localStorage.setItem(DB_KEY, JSON.stringify(state));
+            renderClients();
+            updateConfigUI();
+        }
+
+        function generateId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2);
+        }
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            const bgColor = type === 'success' ? 'bg-success' : 'bg-danger';
+            toast.className = `${bgColor} text-white px-4 py-2 rounded-xl text-sm font-bold shadow-lg animate-slide flex items-center gap-2`;
+            toast.innerHTML = `<i class="ph-bold ${type === 'success' ? 'ph-check-circle' : 'ph-warning-circle'}"></i> ${message}`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(10px)';
+                toast.style.transition = 'all 0.3s';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // --- Theme ---
+        function applyTheme() {
+            const isDark = localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+            if (isDark) {
+                document.documentElement.classList.add('dark');
+                document.getElementById('theme-icon')?.classList.replace('ph-moon', 'ph-sun');
+            } else {
+                document.documentElement.classList.remove('dark');
+                document.getElementById('theme-icon')?.classList.replace('ph-sun', 'ph-moon');
+            }
+        }
+
+        function toggleTheme() {
+            const isDark = document.documentElement.classList.contains('dark');
+            localStorage.setItem('theme', isDark ? 'light' : 'dark');
+            applyTheme();
+        }
+
+        // --- Auth ---
+        function setLoginMode(mode) {
+            const btnG = document.getElementById('tab-google');
+            const btnC = document.getElementById('tab-custom');
+            const formG = document.getElementById('google-login-form');
+            const formC = document.getElementById('custom-login-form');
+
+            if (mode === 'google') {
+                btnG.className = 'flex-1 py-2.5 rounded-xl font-bold text-sm transition-all bg-brand text-white shadow-lg';
+                btnC.className = 'flex-1 py-2.5 rounded-xl font-bold text-sm transition-all text-text-dim hover:bg-surface';
+                formG.classList.remove('hidden');
+                formC.classList.add('hidden');
+            } else {
+                btnC.className = 'flex-1 py-2.5 rounded-xl font-bold text-sm transition-all bg-brand text-white shadow-lg';
+                btnG.className = 'flex-1 py-2.5 rounded-xl font-bold text-sm transition-all text-text-dim hover:bg-surface';
+                formC.classList.remove('hidden');
+                formG.classList.add('hidden');
+            }
+        }
+
+        function handleLogin(mode, e) {
+            if (e) e.preventDefault();
+            const errEl = document.getElementById('auth-error');
+            errEl.classList.add('hidden');
+
+            if (mode === 'google') {
+                // Mock Google Login
+                currentUser = { username: 'Admin User', role: 'admin' };
+                localStorage.setItem('mustafa_user', JSON.stringify(currentUser));
+                init();
+            } else {
+                const u = document.getElementById('login-username').value;
+                const p = document.getElementById('login-password').value;
+                if (u === 'احمد عبد الرحمن' && p === 'Shousha30') {
+                    currentUser = { username: 'احمد عبد الرحمن', role: 'admin' };
+                    localStorage.setItem('mustafa_user', JSON.stringify(currentUser));
+                    init();
+                } else {
+                    errEl.innerText = 'اسم المستخدم أو كلمة المرور غير صحيحة';
+                    errEl.classList.remove('hidden');
+                }
+            }
+        }
+
+        function handleLogout() {
+            localStorage.removeItem('mustafa_user');
+            currentUser = null;
+            init();
+        }
+
+        // --- UI Updates ---
+        function updateConfigUI() {
+            document.getElementById('header-logo').src = state.config.logo;
+            document.getElementById('header-title').innerText = state.config.name;
+            document.getElementById('set-name').value = state.config.name;
+            document.getElementById('set-logo').value = state.config.logo;
+            document.getElementById('set-info').value = state.config.info;
+        }
+
+        function renderClients() {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            const filtered = state.clients.filter(c => c.name.toLowerCase().includes(searchTerm));
+            
+            let totalDebt = 0;
+            let totalPaid = 0;
+            
+            const grid = document.getElementById('clients-grid');
+            grid.innerHTML = '';
+
+            state.clients.forEach(c => {
+                totalDebt += (c.total || 0) - (c.paid || 0);
+                totalPaid += (c.paid || 0);
+            });
+
+            document.getElementById('stat-debt').innerText = totalDebt.toLocaleString();
+            document.getElementById('stat-paid').innerText = totalPaid.toLocaleString();
+            document.getElementById('stat-clients').innerText = state.clients.length;
+
+            filtered.forEach(c => {
+                const remaining = (c.total || 0) - (c.paid || 0);
+                grid.innerHTML += `
+                    <div class="bg-surface p-5 sm:p-6 rounded-3xl card-shadow border border-border hover:border-brand/30 transition-all group">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-brand-soft flex items-center justify-center text-brand group-hover:bg-brand group-hover:text-white transition-all">
+                                    <i class="ph-bold ph-users text-xl"></i>
+                                </div>
+                                <h3 class="text-lg font-black truncate max-w-[150px] sm:max-w-none text-text">${c.name}</h3>
+                            </div>
+                            <button onclick="openHistory('${c.id}')" class="p-2 bg-background rounded-lg text-text-dim hover:text-brand transition-colors"><i class="ph-bold ph-clock-counter-clockwise text-lg"></i></button>
+                        </div>
+                        <div class="mb-6">
+                            <p class="text-text-dim text-[10px] font-black mb-1 uppercase tracking-wider">المبلغ المتبقي</p>
+                            <div class="text-2xl font-black text-brand">${remaining.toLocaleString()} <span class="text-xs font-medium">ج.م</span></div>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="openTransaction('${c.id}', 'payment')" class="flex-1 bg-success text-white py-2.5 rounded-xl font-bold text-xs shadow-lg shadow-success/20 hover:bg-success/90 hover:scale-[1.02] active:scale-95 transition-all">تحصيل</button>
+                            <button onclick="openTransaction('${c.id}', 'debt')" class="flex-1 bg-brand-soft text-brand border border-brand/20 py-2.5 rounded-xl font-bold text-xs hover:bg-brand hover:text-white transition-all">دين جديد</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // --- Actions ---
+        function addClient(e) {
+            e.preventDefault();
+            const name = document.getElementById('new-client-name').value;
+            const total = parseFloat(document.getElementById('new-client-total').value);
+            
+            const newClient = {
+                id: generateId(),
+                name,
+                total,
+                paid: 0,
+                history: [{
+                    date: new Date().toISOString(),
+                    type: 'debt',
+                    amount: total,
+                    user: currentUser.username
+                }]
+            };
+            
+            state.clients.push(newClient);
+            saveData();
+            closeModal('add-client-modal');
+            e.target.reset();
+            showToast('تم إضافة العميل بنجاح');
+        }
+
+        function openTransaction(clientId, type) {
+            selectedClientId = clientId;
+            currentTxType = type;
+            const client = state.clients.find(c => c.id === clientId);
+            
+            document.getElementById('tx-title').innerText = type === 'payment' ? 'تحصيل دفعة' : 'دين جديد';
+            document.getElementById('tx-client-name').innerText = client.name;
+            
+            const btn = document.getElementById('tx-submit-btn');
+            btn.className = `w-full py-3 rounded-xl font-bold text-white ${type === 'payment' ? 'bg-success' : 'bg-brand'}`;
+            
+            document.getElementById('tx-amount').value = '';
+            document.getElementById('tx-notes').value = '';
+            
+            openModal('transaction-modal');
+        }
+
+        function submitTransaction(e) {
+            e.preventDefault();
+            const amount = parseFloat(document.getElementById('tx-amount').value);
+            const notes = document.getElementById('tx-notes').value;
+            
+            const client = state.clients.find(c => c.id === selectedClientId);
+            if (!client) return;
+
+            if (currentTxType === 'payment') client.paid += amount;
+            else client.total += amount;
+
+            client.history.push({
+                date: new Date().toISOString(),
+                type: currentTxType,
+                amount,
+                notes,
+                user: currentUser.username
+            });
+
+            saveData();
+            closeModal('transaction-modal');
+            showToast(currentTxType === 'payment' ? 'تم تسجيل الدفعة بنجاح' : 'تم إضافة الدين بنجاح');
+        }
+
+        function openHistory(clientId) {
+            selectedClientId = clientId;
+            const client = state.clients.find(c => c.id === clientId);
+            if (!client) return;
+
+            document.getElementById('hist-client-name').innerText = client.name;
+            
+            // Print Setup
+            document.getElementById('print-company-name').innerText = state.config.name;
+            document.getElementById('print-company-info').innerText = state.config.info;
+            document.getElementById('print-logo').src = state.config.logo;
+            document.getElementById('print-client-name').innerText = client.name;
+            document.getElementById('print-date').innerText = new Date().toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' });
+            document.getElementById('print-total').innerText = (client.total || 0).toLocaleString();
+            document.getElementById('print-paid').innerText = (client.paid || 0).toLocaleString();
+            document.getElementById('print-balance').innerText = ((client.total || 0) - (client.paid || 0)).toLocaleString();
+            document.getElementById('print-footer-date').innerText = `بتاريخ: ${new Date().toLocaleString('ar-EG')}`;
+            document.getElementById('print-footer-logo').src = state.config.logo;
+            document.getElementById('print-footer-name').innerText = state.config.name;
+
+            // Admin Delete
+            const delZone = document.getElementById('admin-delete-zone');
+            if (currentUser.role === 'admin') delZone.classList.remove('hidden');
+            else delZone.classList.add('hidden');
+
+            // Table
+            let balance = 0;
+            const sortedHistory = [...client.history].sort((a, b) => new Date(a.date) - new Date(b.date));
+            const historyWithBalance = sortedHistory.map(h => {
+                balance += h.type === 'payment' ? -h.amount : h.amount;
+                return { ...h, balance };
+            }).reverse();
+
+            const tbody = document.getElementById('history-table-body');
+            tbody.innerHTML = '';
+            historyWithBalance.forEach((h, i) => {
+                const actualIndex = client.history.indexOf(sortedHistory[sortedHistory.length - 1 - i]);
+                const dateStr = new Date(h.date).toLocaleString('ar-EG').split(',')[0];
+                const isPay = h.type === 'payment';
+                
+                tbody.innerHTML += `
+                    <tr class="hover:bg-brand-soft transition-colors">
+                        <td class="p-4 text-text-dim font-bold text-xs">${dateStr}</td>
+                        <td class="p-4">
+                            <div class="flex items-center gap-2">
+                                <div class="w-2 h-2 rounded-full ${isPay ? 'bg-success' : 'bg-brand'}"></div>
+                                <span class="font-bold text-text">${isPay ? 'تحصيل دفعة' : 'إضافة مديونية'}</span>
+                            </div>
+                            ${h.notes ? `<p class="text-[10px] text-text-dim mt-1 font-medium">${h.notes}</p>` : ''}
+                        </td>
+                        <td class="p-4 font-black ${isPay ? 'text-success' : 'text-brand'}">
+                            ${isPay ? '-' : '+'}${h.amount.toLocaleString()}
+                        </td>
+                        <td class="p-4 font-black text-text bg-brand-soft">
+                            ${h.balance.toLocaleString()}
+                        </td>
+                        <td class="p-4 no-print">
+                            <div class="flex gap-1">
+                                <button onclick="window.print()" class="p-2 text-brand hover:bg-brand-soft rounded-xl transition-colors"><i class="ph-bold ph-printer text-lg"></i></button>
+                                <button onclick="deleteTransaction(${actualIndex})" class="p-2 text-danger hover:bg-danger-soft rounded-xl transition-colors"><i class="ph-bold ph-trash text-lg"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            openModal('history-modal');
+        }
+
+        function deleteTransaction(index) {
+            if (!confirm('هل أنت متأكد من حذف هذه المعاملة؟')) return;
+            const client = state.clients.find(c => c.id === selectedClientId);
+            const tx = client.history[index];
+            
+            if (tx.type === 'payment') client.paid -= tx.amount;
+            else client.total -= tx.amount;
+            
+            client.history.splice(index, 1);
+            saveData();
+            openHistory(selectedClientId); // refresh
+            showToast('تم حذف المعاملة بنجاح');
+        }
+
+        function openDeleteConfirm() {
+            const client = state.clients.find(c => c.id === selectedClientId);
+            document.getElementById('delete-client-name').innerText = `"${client.name}"`;
+            openModal('delete-confirm-modal');
+        }
+
+        function confirmDeleteClient() {
+            state.clients = state.clients.filter(c => c.id !== selectedClientId);
+            saveData();
+            closeModal('delete-confirm-modal');
+            closeModal('history-modal');
+            showToast('تم حذف العميل بنجاح');
+        }
+
+        // --- Settings ---
+        function setSettingsTab(tab) {
+            const btnGen = document.getElementById('tab-general');
+            const btnData = document.getElementById('tab-data');
+            const divGen = document.getElementById('settings-general');
+            const divData = document.getElementById('settings-data');
+
+            if (tab === 'general') {
+                btnGen.className = 'flex-1 py-2.5 rounded-xl text-xs font-bold transition-all bg-brand text-white shadow-md';
+                btnData.className = 'flex-1 py-2.5 rounded-xl text-xs font-bold transition-all text-text-dim hover:bg-surface';
+                divGen.classList.remove('hidden');
+                divData.classList.add('hidden');
+            } else {
+                btnData.className = 'flex-1 py-2.5 rounded-xl text-xs font-bold transition-all bg-brand text-white shadow-md';
+                btnGen.className = 'flex-1 py-2.5 rounded-xl text-xs font-bold transition-all text-text-dim hover:bg-surface';
+                divData.classList.remove('hidden');
+                divGen.classList.add('hidden');
+            }
+        }
+
+        function saveSettings(e) {
+            e.preventDefault();
+            state.config.name = document.getElementById('set-name').value;
+            state.config.logo = document.getElementById('set-logo').value;
+            state.config.info = document.getElementById('set-info').value;
+            saveData();
+            showToast('تم الحفظ بنجاح');
+        }
+
+        function exportData() {
+            const dataStr = JSON.stringify(state.clients, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            const link = document.createElement('a');
+            link.href = dataUri;
+            link.download = `backup_${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+            showToast('تم تصدير البيانات');
+        }
+
+        function importData(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                try {
+                    const data = JSON.parse(event.target.result);
+                    if (Array.isArray(data)) {
+                        state.clients = data;
+                        saveData();
+                        showToast('تم استيراد البيانات بنجاح');
+                    }
+                } catch (err) {
+                    showToast('خطأ في الملف', 'error');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // --- Modal Control ---
+        function openModal(id) {
+            document.getElementById(id).classList.remove('hidden');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+        }
+
+        // Boot
+        init();
     </script>
 </body>
 </html>
